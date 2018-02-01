@@ -1,217 +1,225 @@
-%{
+%code requires {
 #include<stdio.h>
-#include<string.h>	
-#define YYSTYPE char*
+#include "tree.h"
 int yylex();
-int yyerror(char *s);
-%}
-%token insert_k into_k values_k update_k set_k name number select_k from_k where_k order_k by_k and_k or_k asc_k dec_k delete_k datatype_k not_k null_k primary_k key_k auto_k drop_k database_k table_k create_k rename_k alter_k add_k constraint_k limit_k use_k show_k databases_k tables_k columns_k index_k view_k unique_k foreign_k references_k on_k as_k to_k change_k in_k
-%start sql
-%%
-sql : sql_stmt ';' {printf("%s\n",$1);return 0;}
-;
-sql_stmt : update_stmt ;
-		 | select_stmt ;
-		 | drop_stmt ;
-		 | create_stmt ;
-		 | insert_stmt ;
-		 | delete_stmt ;
-		 | rename_stmt;
-		 | alter_stmt;
-		 | use_stmt;
-		 | show_stmt;
-;
-drop_stmt : drop_k type_drop{
-	char arr[200];
-	sprintf(arr,"Drop %s",$2);
-	$$ = strdup(arr);}
-;
-type_drop : database_k name {
-										char arr[10000];
-										sprintf(arr,"Database %s",$2);
-										$$=strdup(arr);}
-			| table_k name_list {
-								char arr[10000];
-								sprintf(arr,"Table %s",$2);
-								$$=strdup(arr);}
-			| index_k name on_k name { }
-			| view_k name_list {}
-;
-create_stmt : create_k type_create{
-										char arr[100000];
-										sprintf(arr,"Create %s",$2);
-										$$ = strdup(arr);}
-;
-type_create : database_k name {
-										char arr[10000];
-										sprintf(arr,"Database %s",$2);
-										$$=strdup(arr);}
-				| table_k name '(' create_def_list ')'{
-								char arr[10000];
-								sprintf(arr,"Table %s with Coloumns %s",$2,$4);
-								$$=strdup(arr);}
-				| index_k name on_k name name '(' name_list ')' {}
-				| view_k name col_list_chk as_k select_stmt {}
-;
-create_def_list : create_def {}
-				| create_def_list ',' create_def {}
-;
-create_def : col_def {	}
-			| constraints { }
-;
-constraints : primary_k key_k col_list_chk {}
-			| index_k col_list_chk {}
-			| unique_k col_list_chk {}
-			| foreign_k key_k col_list_chk references_k name col_list_chk {}
-;
-col_def : name data_type special_list {  char arr[10000];
-														if ($3 == NULL)
-															sprintf(arr,"%s with DataType %s",$1,$2);
-														else
-															sprintf(arr,"%s with DataType %s and Characteristics %s",$1,$2,$3);
-														$$ = strdup(arr);}					
-; 
-data_type : datatype_k {$$ = strdup($1);}
-		  |	datatype_k '(' number ')' { char arr[10000];
-						sprintf(arr,"%s of size %s",$1,$3); $$=strdup(arr);}
-;
-special_list : special_ele { }
-			| special_list special_ele {}
-;
-special_ele : null_k {}
-			| not_k null_k {}
-			| auto_k {}
-			| primary_k key_k {}
-			| unique_k {}
-			| references_k name name {}
-;
-rename_stmt : rename_k table_k rename_list { }
-;
-rename_list : name to_k name { }
-			| rename_list ',' name to_k name {}
-;
-use_stmt : use_k name { }
-;
-show_stmt : show_k type_show { }
-;
-type_show : databases_k { }
-			| tables_k in_k name { }
-			| columns_k in_k name in_k opt_db {}
-;
-opt_db : name { }
-		|	{ }
-;
-insert_stmt : insert_k into_k name col_list_chk values_k val_set{char arr[10000];
-	int length=0;
-	if($4!=NULL)
-	length+=sprintf(arr+length,"Inserting in columns %s values %s",$4,$6);
-	else
-	length+=sprintf(arr+length,"Inserting in all columns  values %s",$6);
-$$=strdup(arr);
-	}
-;
-col_list_chk : '(' name_list ')' {$$=strdup($2);} 
-          | {$$=NULL;}; //either col_list or NUll
-name_list : name {$$=strdup($1);}
-		| name_list ',' name{char arr[100000];
-		sprintf(arr,"%s , %s ",$1,$3); 
-		$$=strdup(arr);}
-;
-val_set : val_list1{$$=strdup($1);} 
-	| val_set ',' val_list1{char arr[1000000];//inserting multiple values seperated by ,
-		sprintf(arr,"%s ; %s",$1,$3);
-	$$=strdup(arr);};
+int yyerror(const char *s);
+}
+%code {
+Sql_stmt *xyz123;
+}
+%define parse.error verbose
 
-val_list1 : '(' val_list ')' {$$=strdup($2) ;};
-val_list : name1{$$=strdup($1);}|val_list ',' name1{char arr[100000];
-	sprintf(arr,"%s , %s",$1,$3); ;
-	$$=strdup(arr);}
+%union
+{
+	Cond_exp *cond_exp;
+	Where_stmt *where_stmt;
+	Orderby_stmt *orderby_stmt;
+	Col_def *col_def;
+	Constraints *constraints;
+	Create_def *create_def;
+	Alter_spec *alter_spec;
+	Sql_stmt *sql_stmt;
+	Update_stmt *update_stmt;
+	Select_stmt *select_stmt;
+	Drop_stmt *drop_stmt;
+	Create_stmt *create_stmt;
+	Insert_stmt *insert_stmt;
+	Delete_stmt *delete_stmt;
+	Rename_stmt *rename_stmt;
+	Alter_stmt *alter_stmt;
+	Use_stmt *use_stmt;
+	Show_stmt *show_stmt;
+	Special_ele *special_ele;
+	std::vector<Special_ele> *special_list;
+	std::vector<Alter_spec> *alter_spec_list;
+	std::vector<Create_def> *create_def_list;
+	std::vector<Col_def> *col_def_list;
+	std::vector<std::string> *str_list;
+	std::vector<std::vector<std::string> > *val_set;
+	std::pair<std::string,std::string> *set_single;
+	std::string *s;
+	int x;
+	bool order;
+	std::vector<std::pair<std::string,std::string> > *rnm_list;
+}
+
+%token <x> insert_k into_k values_k update_k set_k select_k from_k where_k order_k by_k and_k or_k asc_k dec_k delete_k  not_k null_k primary_k key_k auto_k drop_k database_k table_k create_k rename_k alter_k add_k constraint_k limit_k use_k show_k databases_k tables_k columns_k index_k view_k unique_k foreign_k references_k on_k as_k to_k change_k in_k
+
+%token <s> name datatype_k number
+
+%type <rnm_list> rename_list set_list
+%type <order> order_type
+%type <set_single> set_single
+%type <s> data_type opt_db name1
+%type <x> limit_stmt
+%type <str_list> col_list_chk name_list val_list1 val_list select_col_chk
+%type <val_set> val_set
+%type <cond_exp> cond_exp
+%type <where_stmt> where_stmt where_cond
+%type <orderby_stmt> orderby_stmt orderby_list
+%type <col_def> col_def
+%type <special_list> special_list
+%type <special_ele> special_ele 
+%type <constraints> constraints
+%type <create_def> create_def
+%type <create_def_list> create_def_list
+%type <alter_spec> alter_spec
+%type <sql_stmt> sql sql_stmt
+%type <select_stmt> select_stmt
+%type <update_stmt> update_stmt
+%type <drop_stmt> drop_stmt type_drop
+%type <col_def_list> add_col_def col_def_list
+%type <create_stmt> create_stmt type_create
+%type <insert_stmt> insert_stmt
+%type <delete_stmt> delete_stmt
+%type <rename_stmt> rename_stmt
+%type <alter_spec_list> alter_spec_list
+%type <alter_stmt> alter_stmt
+%type <use_stmt> use_stmt
+%type <show_stmt> show_stmt type_show
+
+%start sql
+
+%%
+sql : sql_stmt ';' {xyz123=$1;}
 ;
-name1 : '\'' name '\''{$$=strdup($2);}
-		| name {$$=strdup($1);}
-		| number {$$=strdup($1);}; 
-delete_stmt: delete_k from_k name where_stmt orderby_stmt limit_stmt {char arr[10000];
-	int dl=0;
-	if($4==NULL)
-	dl+=sprintf(arr,"Deleting all records from the table %s",$3);
-	else
-	dl+=sprintf(arr,"Deleting records from the table %s where %s",$3,$4);
-	$$=strdup(arr);
-	}
+sql_stmt : update_stmt {$$=$1;}
+		 | select_stmt {$$=$1;}
+		 | drop_stmt {$$=$1;}
+		 | create_stmt {$$=$1;}
+		 | insert_stmt {$$=$1;}
+		 | delete_stmt {$$=$1;}
+		 | rename_stmt {$$=$1;}
+		 | alter_stmt {$$=$1;}
+		 | use_stmt {$$=$1;}
+		 | show_stmt {$$=$1;}
 ;
-select_stmt : select_k select_col_chk from_k name where_stmt orderby_stmt limit_stmt { char arr[10000];
-			int length=0;
-			if($2==NULL)
-			length+=sprintf(arr+length,"Select All column from table %s",$4);
-			else
-			length+=sprintf(arr+length,"Select column %s from table %s",$2,$4);
-			if($5!=NULL)
-			length+=sprintf(arr+length," Where %s",$5);
-			if($6!=NULL)
-			length+=sprintf(arr+length," Order By %s",$6);
-			$$=strdup(arr);}
+drop_stmt : drop_k type_drop{$$=$2;}
+;
+type_drop : database_k name {$$=new Db_drop($2);}
+			| table_k name_list {$$=new Tbl_drop($2);}
+			| index_k name on_k name {$$=new Idx_drop($2,$4);}
+			| view_k name_list {$$=new View_drop($2);}
+;
+create_stmt : create_k type_create{$$=$2;}
+;
+type_create : database_k name {$$=new Db_create($2);}
+				| table_k name '(' create_def_list ')'{$$=new Tbl_create($2,$4);}
+				| index_k name on_k name '(' name_list ')' {$$=new Idx_create($2,$4,$6);}
+				| view_k name col_list_chk as_k select_stmt {$$=new View_create($2,$3,$5);}
+;
+create_def_list : create_def {vector<Create_def> list;
+								list.push_back(*$1);
+								$$=&list;}
+				| create_def_list ',' create_def {$$=$1;$$->push_back(*$3);}
+;
+create_def : col_def {	$$=new Create_def();$$->type=1;((*$$).x).cd=$1;}
+			| constraints {$$=new Create_def();$$->type=2;((*$$).x).con=$1; }
+;
+constraints : primary_k key_k col_list_chk {$$=new Primary_key($3);}
+			| index_k col_list_chk {$$=new Index_key($2);}
+			| unique_k col_list_chk {$$=new Unique_key($2);}
+			| foreign_k key_k col_list_chk references_k name col_list_chk {$$=new Foreign_key($3,$5,$6);}
+;
+col_def : name data_type special_list { $$=new Col_def($1,$2,$3);}					
+; 
+data_type : datatype_k {$$ = $1;}
+		  |	datatype_k '(' number ')' { $$=$1;}
+;
+special_list : special_ele { vector<Special_ele> list; list.push_back(*$1);$$=&list;}
+			| special_list special_ele {$$=$1;$$->push_back(*$2);}
+;
+special_ele : not_k null_k {$$=new Special_ele(1);}
+			| auto_k {$$=new Special_ele(2);}
+			| primary_k key_k {$$=new Special_ele(3);}
+			| unique_k {$$=new Special_ele(4);}
+			| references_k name name {$$=new Special_ele(5,$2,$3);}
+;
+rename_stmt : rename_k table_k rename_list { $$=new Rename_stmt($3);}
+;
+rename_list : name to_k name { vector<pair<string,string> > list;list.push_back(make_pair(*$1,*$3));$$=&list;}
+			| rename_list ',' name to_k name {$$=$1;$$->push_back(make_pair(*$3,*$5));}
+;
+use_stmt : use_k name { $$=new Use_stmt($2);}
+;
+show_stmt : show_k type_show {$$=$2; }
+;
+type_show : databases_k { $$=new Db_show();}
+			| tables_k in_k name { $$=new Tbl_show($3);}
+			| columns_k in_k name in_k opt_db {$$=new Clmns_show($3,$5);}
+;
+opt_db : name { $$=$1;}
+		|	{ $$=NULL;}
+;
+insert_stmt : insert_k into_k name col_list_chk values_k val_set{$$=new Insert_stmt($3,$4,$6);}
+;
+col_list_chk : '(' name_list ')' {$$=$2;} 
+          | {$$=NULL;}; //either col_list or NUll
+name_list : name {vector<string> list;list.push_back(*$1);$$=&list;}
+		| name_list ',' name{$$=$1;$$->push_back(*$3);}
+;
+val_set : val_list1{vector<vector<string> > list;list.push_back(*$1);$$=&list;} 
+	| val_set ',' val_list1{$$=$1;$$->push_back(*$3);}
+;
+val_list1 : '(' val_list ')' {$$=$2;}
+;
+val_list : name1{vector<string> list;list.push_back(*$1);$$=&list;}
+		| val_list ',' name1{$$=$1;$$->push_back(*$3);}
+;
+name1 : '\'' name '\''{$$=$2;}
+		| name {$$=$1;}
+		| number {$$=$1;}; 
+delete_stmt: delete_k from_k name where_stmt orderby_stmt limit_stmt {$$=new Delete_stmt($3,$4,$5,$6);}
+;
+select_stmt : select_k select_col_chk from_k name where_stmt orderby_stmt limit_stmt {$$=new Select_stmt($2,$4,$5,$6,$7);}
 ;
 select_col_chk : '*' {$$=NULL;}
-		 | name_list {}
+		 | name_list 
 ;
-where_stmt : where_k where_cond {$$=strdup($2);}
+where_stmt : where_k where_cond {$$=$2;}
 			| {$$=NULL;}
 ;
-where_cond : set_single {$$=strdup($1);}
-			| where_cond and_k set_single {char arr[10000];
-							sprintf(arr,"%s AND %s",$1,$3);
-							$$=strdup(arr);}
-			| where_cond or_k set_single {
-							char arr[10000];
-							sprintf(arr,"%s OR %s",$1,$3);
-							$$=strdup(arr);}
+where_cond : cond_exp {$$=new Where_stmt($1);}
+			| where_cond and_k cond_exp {$$=$1;$$->and_list->push_back(*$3);}
+			| where_cond or_k cond_exp {$$=$1;$$->or_list->push_back(*$3);}
 ;
-orderby_stmt : order_k by_k orderby_list {$$=strdup($3);}
+cond_exp : name '=' name {$$=new Cond_exp();$$->type=1;$$->lhs=*$1;((*$$).x).s_rhs=$3;}
+			| name '=' number {$$=new Cond_exp();$$->type=2;$$->lhs=*$1;((*$$).x).i_rhs=stoi(*$3);}
+;
+orderby_stmt : order_k by_k orderby_list {$$=$3;}
 			| {$$=NULL;}
 ;
-orderby_list : name order_type	{char arr[10000];
-							sprintf(arr,"Order column %s by %s",$1,$2);
-							$$=strdup(arr);}
-			| orderby_list ',' name order_type { char arr[10000];
-							sprintf(arr,"%s and Order column %s by %s",$1,$3,$4);
-							$$=strdup(arr);}
+orderby_list : name order_type	{$$=new Orderby_stmt(make_pair(*$1,$2));}
+			| orderby_list ',' name order_type {$$=$1;$$->clmns_list->push_back(make_pair(*$3,$4));}
 ;
-order_type : asc_k {$$=strdup("asc");} 
-			| dec_k {$$=strdup("desc");}
+order_type : asc_k {$$=true;} 
+			| dec_k {$$=false;}
 ;
-update_stmt : update_k name set_k set_list where_stmt orderby_stmt limit_stmt {
-	char arr[10000];
-	sprintf(arr,"Update Table %s with %s",$2,$4);
-	$$=strdup(arr);}
+update_stmt : update_k name set_k set_list orderby_stmt limit_stmt {$$=new Update_stmt($2,$4,$5,$6);}
 ;
-set_list : set_single {$$=strdup($1);} 
-		| set_list ',' set_single  { char arr[10000];
-									sprintf(arr,"%s , %s",$1,$3);
-									$$=strdup(arr);}
+set_list : set_single {vector<pair<string,string> > list;list.push_back(*$1);$$=&list;} 
+		| set_list ',' set_single  { $$=$1;$$->push_back(*$3);}
 ;
-set_single : name '=' name { char arr[10000];
-							sprintf(arr,"%s=%s",$1,$3);
-							$$=strdup(arr);}
-			| name '=' number {char arr[10000];
-							sprintf(arr,"%s=%s",$1,$3);
-							$$=strdup(arr);}
+set_single : name '=' name {pair<string,string> t=make_pair(*$1,*$3);$$=&t;}
+			| name '=' number {pair<string,string> t=make_pair(*$1,*$3);$$=&t;}
 ;
-limit_stmt : limit_k number {}
+limit_stmt : limit_k number {$$=stoi(*$2);}
+			| {$$=0;}
 ;
-alter_stmt : alter_k table_k name alter_spec_list {}
+alter_stmt : alter_k table_k name alter_spec_list {$$=new Alter_stmt($3,$4);}
 ;
-alter_spec_list : alter_spec {}
-				| alter_spec_list ',' alter_spec {}
+alter_spec_list : alter_spec {vector<Alter_spec> list;list.push_back(*$1);$$=&list;}
+				| alter_spec_list ',' alter_spec {$$=$1;$$->push_back(*$3);}
 ;
-add_col_def : col_def {}
-			| '(' col_def_list ')' {}
+add_col_def : col_def {vector<Col_def> list;list.push_back(*$1);$$=&list;}
+			| '(' col_def_list ')' {$$=$2;}
 ;
-col_def_list : col_def {}
-			| col_def_list ',' col_def {}
+col_def_list : col_def {vector<Col_def> list;list.push_back(*$1);$$=&list;}
+			| col_def_list ',' col_def {$$=$1;$$->push_back(*$3);}
 ;
-alter_spec : add_k add_col_def {}
-			| add_k constraint_k constraints {}
-			| change_k name col_def {}
+alter_spec : add_k add_col_def {$$=new Alter_spec();$$->type=1;((*$$).x).add_col=$2;}
+			| add_k constraint_k constraints {$$=new Alter_spec();$$->type=2;((*$$).x).con=$3;}
+			| change_k name col_def {$$=new Alter_spec();$$->type=3;((*$$).x).cng_col=new Change_col($2,$3);}
 ;
 %%
 int main()
@@ -219,7 +227,7 @@ int main()
 printf("Enter Sql Expression:\n");
 yyparse();
 }
-int yyerror(char *s)
+int yyerror(const char *s)
 {
 printf("%s\n",s);
 return 1;
