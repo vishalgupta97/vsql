@@ -7,5 +7,5 @@ lexer: lex.yy.c
 	flex sql.l
 
 sql : lexer parser
-	-g++ --std=c++14 lex.yy.c sql.tab.c -lfl 2> error.txt
+	-g++ -I ../Library --std=c++14 ../Library/pugixml/pugixml.cpp lex.yy.c sql.tab.c main.cpp -lfl 2> error.txt
 	/mnt/c/Windows/System32/notepad.exe error.txt

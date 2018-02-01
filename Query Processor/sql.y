@@ -5,7 +5,7 @@ int yylex();
 int yyerror(const char *s);
 }
 %code {
-Sql_stmt *xyz123;
+Sql_stmt *xyz123=0;
 }
 %define parse.error verbose
 
@@ -82,6 +82,7 @@ Sql_stmt *xyz123;
 
 %%
 sql : sql_stmt ';' {xyz123=$1;}
+	| {xyz123=NULL;}
 ;
 sql_stmt : update_stmt {$$=$1;}
 		 | select_stmt {$$=$1;}
@@ -222,11 +223,6 @@ alter_spec : add_k add_col_def {$$=new Alter_spec();$$->type=1;((*$$).x).add_col
 			| change_k name col_def {$$=new Alter_spec();$$->type=3;((*$$).x).cng_col=new Change_col($2,$3);}
 ;
 %%
-int main()
-{
-printf("Enter Sql Expression:\n");
-yyparse();
-}
 int yyerror(const char *s)
 {
 printf("%s\n",s);

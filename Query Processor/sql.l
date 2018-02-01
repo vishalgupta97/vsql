@@ -52,5 +52,6 @@ CHANGE|change return change_k;
 "="|","|";"|"*"|"("|")"|"\'" return yytext[0];
 {name_exp} {yylval.s=new std::string(yytext,yyleng); return name;}
 {number} {yylval.s=new std::string(yytext,yyleng); return number;}
-[ \t\n] ;
+"\n" return 0;
+[ \t] ;
 %%
