@@ -5,7 +5,7 @@ int yylex();
 int yyerror(const char *s);
 }
 %code {
-Sql_stmt *xyz123=0;
+Sql_stmt *stmt1=0;
 }
 %define parse.error verbose
 
@@ -30,17 +30,17 @@ Sql_stmt *xyz123=0;
 	Use_stmt *use_stmt;
 	Show_stmt *show_stmt;
 	Special_ele *special_ele;
-	std::vector<Special_ele> *special_list;
-	std::vector<Alter_spec> *alter_spec_list;
-	std::vector<Create_def> *create_def_list;
-	std::vector<Col_def> *col_def_list;
-	std::vector<std::string> *str_list;
-	std::vector<std::vector<std::string> > *val_set;
-	std::pair<std::string,std::string> *set_single;
+	std::vector<Special_ele*> *special_list;
+	std::vector<Alter_spec*> *alter_spec_list;
+	std::vector<Create_def*> *create_def_list;
+	std::vector<Col_def*> *col_def_list;
+	std::vector<std::string*> *str_list;
+	std::vector<std::vector<std::string*>* > *val_set;
+	std::pair<std::string*,std::string*> *set_single;
 	std::string *s;
 	int x;
 	bool order;
-	std::vector<std::pair<std::string,std::string> > *rnm_list;
+	std::vector<std::pair<std::string*,std::string*>* > *rnm_list;
 }
 
 %token <x> insert_k into_k values_k update_k set_k select_k from_k where_k order_k by_k and_k or_k asc_k dec_k delete_k  not_k null_k primary_k key_k auto_k drop_k database_k table_k create_k rename_k alter_k add_k constraint_k limit_k use_k show_k databases_k tables_k columns_k index_k view_k unique_k foreign_k references_k on_k as_k to_k change_k in_k
@@ -81,8 +81,8 @@ Sql_stmt *xyz123=0;
 %start sql
 
 %%
-sql : sql_stmt ';' {xyz123=$1;}
-	| {xyz123=NULL;}
+sql : sql_stmt ';' {stmt1=$1;}
+	| {stmt1=NULL;}
 ;
 sql_stmt : update_stmt {$$=$1;}
 		 | select_stmt {$$=$1;}
@@ -109,13 +109,13 @@ type_create : database_k name {$$=new Db_create($2);}
 				| index_k name on_k name '(' name_list ')' {$$=new Idx_create($2,$4,$6);}
 				| view_k name col_list_chk as_k select_stmt {$$=new View_create($2,$3,$5);}
 ;
-create_def_list : create_def {vector<Create_def> list;
-								list.push_back(*$1);
-								$$=&list;}
-				| create_def_list ',' create_def {$$=$1;$$->push_back(*$3);}
+create_def_list : create_def {vector<Create_def*> *list=new vector<Create_def*>();
+								list->push_back($1);
+								$$=list;}
+				| create_def_list ',' create_def {$$=$1;$$->push_back($3);}
 ;
-create_def : col_def {	$$=new Create_def();$$->type=1;((*$$).x).cd=$1;}
-			| constraints {$$=new Create_def();$$->type=2;((*$$).x).con=$1; }
+create_def : col_def {	$$=new Create_def();$$->type=1;($$->x).cd=$1;}
+			| constraints {$$=new Create_def();$$->type=2;($$->x).con=$1; }
 ;
 constraints : primary_k key_k col_list_chk {$$=new Primary_key($3);}
 			| index_k col_list_chk {$$=new Index_key($2);}
@@ -127,8 +127,8 @@ col_def : name data_type special_list { $$=new Col_def($1,$2,$3);}
 data_type : datatype_k {$$ = $1;}
 		  |	datatype_k '(' number ')' { $$=$1;}
 ;
-special_list : special_ele { vector<Special_ele> list; list.push_back(*$1);$$=&list;}
-			| special_list special_ele {$$=$1;$$->push_back(*$2);}
+special_list : special_ele { vector<Special_ele*> *list=new vector<Special_ele*>(); list->push_back($1);$$=list;}
+			| special_list special_ele {$$=$1;$$->push_back($2);}
 ;
 special_ele : not_k null_k {$$=new Special_ele(1);}
 			| auto_k {$$=new Special_ele(2);}
@@ -138,8 +138,8 @@ special_ele : not_k null_k {$$=new Special_ele(1);}
 ;
 rename_stmt : rename_k table_k rename_list { $$=new Rename_stmt($3);}
 ;
-rename_list : name to_k name { vector<pair<string,string> > list;list.push_back(make_pair(*$1,*$3));$$=&list;}
-			| rename_list ',' name to_k name {$$=$1;$$->push_back(make_pair(*$3,*$5));}
+rename_list : name to_k name { vector<pair<string*,string*>* > *list=new vector<pair<string*,string*>* >(); list->push_back(new pair<string*,string*>($1,$3));$$=list;}
+			| rename_list ',' name to_k name {$$=$1;$$->push_back(new pair<string*,string*>($3,$5));}
 ;
 use_stmt : use_k name { $$=new Use_stmt($2);}
 ;
@@ -156,16 +156,16 @@ insert_stmt : insert_k into_k name col_list_chk values_k val_set{$$=new Insert_s
 ;
 col_list_chk : '(' name_list ')' {$$=$2;} 
           | {$$=NULL;}; //either col_list or NUll
-name_list : name {vector<string> list;list.push_back(*$1);$$=&list;}
-		| name_list ',' name{$$=$1;$$->push_back(*$3);}
+name_list : name {vector<string*> *list=new vector<string*>();list->push_back($1);$$=list;}
+		| name_list ',' name{$$=$1;$$->push_back($3);}
 ;
-val_set : val_list1{vector<vector<string> > list;list.push_back(*$1);$$=&list;} 
-	| val_set ',' val_list1{$$=$1;$$->push_back(*$3);}
+val_set : val_list1{vector<vector<string*>* > *list=new vector<vector<string*>* >();list->push_back($1);$$=list;} 
+	| val_set ',' val_list1{$$=$1;$$->push_back($3);}
 ;
 val_list1 : '(' val_list ')' {$$=$2;}
 ;
-val_list : name1{vector<string> list;list.push_back(*$1);$$=&list;}
-		| val_list ',' name1{$$=$1;$$->push_back(*$3);}
+val_list : name1{vector<string*> *list=new vector<string*>();list->push_back($1);$$=list;}
+		| val_list ',' name1{$$=$1;$$->push_back($3);}
 ;
 name1 : '\'' name '\''{$$=$2;}
 		| name {$$=$1;}
@@ -181,46 +181,47 @@ where_stmt : where_k where_cond {$$=$2;}
 			| {$$=NULL;}
 ;
 where_cond : cond_exp {$$=new Where_stmt($1);}
-			| where_cond and_k cond_exp {$$=$1;$$->and_list->push_back(*$3);}
-			| where_cond or_k cond_exp {$$=$1;$$->or_list->push_back(*$3);}
+			| where_cond and_k cond_exp {$$=$1;$$->and_list->push_back($3);}
+			| where_cond or_k cond_exp {$$=$1;$$->or_list->push_back($3);}
 ;
-cond_exp : name '=' name {$$=new Cond_exp();$$->type=1;$$->lhs=*$1;((*$$).x).s_rhs=$3;}
-			| name '=' number {$$=new Cond_exp();$$->type=2;$$->lhs=*$1;((*$$).x).i_rhs=stoi(*$3);}
+cond_exp : name '=' name {$$=new Cond_exp();$$->type=1;$$->lhs=$1;($$->x).s_rhs=$3;}
+			| name '=' number {$$=new Cond_exp();$$->type=2;$$->lhs=$1;($$->x).i_rhs=stoi(*$3);}
 ;
 orderby_stmt : order_k by_k orderby_list {$$=$3;}
 			| {$$=NULL;}
 ;
-orderby_list : name order_type	{$$=new Orderby_stmt(make_pair(*$1,$2));}
-			| orderby_list ',' name order_type {$$=$1;$$->clmns_list->push_back(make_pair(*$3,$4));}
+orderby_list : name order_type	{$$=new Orderby_stmt(new pair<string*,bool>($1,$2));}
+			| orderby_list ',' name order_type {$$=$1;$$->clmns_list->push_back(new pair<string*,bool>($3,$4));}
 ;
 order_type : asc_k {$$=true;} 
 			| dec_k {$$=false;}
 ;
 update_stmt : update_k name set_k set_list orderby_stmt limit_stmt {$$=new Update_stmt($2,$4,$5,$6);}
 ;
-set_list : set_single {vector<pair<string,string> > list;list.push_back(*$1);$$=&list;} 
-		| set_list ',' set_single  { $$=$1;$$->push_back(*$3);}
+set_list : set_single {vector<pair<string*,string*>* > *list=new vector<pair<string*,string*>* >(); 		  
+						list->push_back($1);$$=list;} 
+		| set_list ',' set_single  { $$=$1;$$->push_back($3);}
 ;
-set_single : name '=' name {pair<string,string> t=make_pair(*$1,*$3);$$=&t;}
-			| name '=' number {pair<string,string> t=make_pair(*$1,*$3);$$=&t;}
+set_single : name '=' name {$$=new pair<string*,string*>($1,$3);}
+			| name '=' number {$$=new pair<string*,string*>($1,$3);}
 ;
 limit_stmt : limit_k number {$$=stoi(*$2);}
 			| {$$=0;}
 ;
 alter_stmt : alter_k table_k name alter_spec_list {$$=new Alter_stmt($3,$4);}
 ;
-alter_spec_list : alter_spec {vector<Alter_spec> list;list.push_back(*$1);$$=&list;}
-				| alter_spec_list ',' alter_spec {$$=$1;$$->push_back(*$3);}
+alter_spec_list : alter_spec {vector<Alter_spec*> *list=new vector<Alter_spec*>();list->push_back($1);$$=list;}
+				| alter_spec_list ',' alter_spec {$$=$1;$$->push_back($3);}
 ;
-add_col_def : col_def {vector<Col_def> list;list.push_back(*$1);$$=&list;}
+add_col_def : col_def {vector<Col_def*> *list=new vector<Col_def*>();list->push_back($1);$$=list;}
 			| '(' col_def_list ')' {$$=$2;}
 ;
-col_def_list : col_def {vector<Col_def> list;list.push_back(*$1);$$=&list;}
-			| col_def_list ',' col_def {$$=$1;$$->push_back(*$3);}
+col_def_list : col_def {vector<Col_def*> *list=new vector<Col_def*>();list->push_back($1);$$=list;}
+			| col_def_list ',' col_def {$$=$1;$$->push_back($3);}
 ;
-alter_spec : add_k add_col_def {$$=new Alter_spec();$$->type=1;((*$$).x).add_col=$2;}
-			| add_k constraint_k constraints {$$=new Alter_spec();$$->type=2;((*$$).x).con=$3;}
-			| change_k name col_def {$$=new Alter_spec();$$->type=3;((*$$).x).cng_col=new Change_col($2,$3);}
+alter_spec : add_k add_col_def {$$=new Alter_spec();$$->type=1;($$->x).add_col=$2;}
+			| add_k constraint_k constraints {$$=new Alter_spec();$$->type=2;($$->x).con=$3;}
+			| change_k name col_def {$$=new Alter_spec();$$->type=3;($$->x).cng_col=new Change_col($2,$3);}
 ;
 %%
 int yyerror(const char *s)
