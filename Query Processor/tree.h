@@ -15,6 +15,13 @@ class Cond_exp
 		string *s_rhs;//type=true
 		int i_rhs;//type=false
 	}x;
+	~Cond_exp()
+	{
+		if(lhs)
+			delete lhs;
+		if(type&&x.s_rhs)
+			delete x.s_rhs;
+	}
 };
 class Where_stmt
 { public:
@@ -131,6 +138,13 @@ class Create_def
 		Col_def *cd;//1
 		Constraints *con;//2
 	}x;
+	~Create_def()
+	{
+		if(type==1&&x.cd)
+			delete x.cd;
+		else if(type==2&&x.con)
+			delete x.con;
+	}
 };
 class Change_col
 { public:
@@ -153,6 +167,20 @@ class Alter_spec
 		Constraints *con;
 		Change_col *cng_col;
 	}x;
+	~Alter_spec()
+	{
+		if(type==1&&x.add_col)
+		{
+			for(int i=0;i<x.add_col->size();i++)
+				delete x.add_col->at(i);
+			x.add_col->clear();
+			delete x.add_col;
+		}
+		else if(type==2&&x.con)
+			delete x.con;
+		else if(type==3&&x.cng_col)
+			delete x.cng_col;
+	}
 };
 class Sql_stmt
 { public:
@@ -162,6 +190,7 @@ class Sql_stmt
 	Sql_stmt(int type1,int type_c1):type(type1),type_c(type_c1){}
 	virtual void check(pugi::xml_node &root)=0;
 	virtual void execute(pugi::xml_node &root)=0;
+	virtual ~Sql_stmt(){}
 };
 class Update_stmt: public Sql_stmt
 { public:
@@ -222,6 +251,7 @@ class Drop_stmt: public Sql_stmt
 	Drop_stmt(int type1):Sql_stmt(3,type1){}
 	virtual void check(pugi::xml_node &root)=0;
 	virtual void execute(pugi::xml_node &root)=0;
+	virtual ~Drop_stmt(){}
 } ;
 class Db_drop: public Drop_stmt
 { public:
@@ -311,6 +341,7 @@ class Create_stmt: public Sql_stmt
 	Create_stmt(int type1):Sql_stmt(4,type1){}
 	virtual void check(pugi::xml_node &root)=0;
 	virtual void execute(pugi::xml_node &root)=0;
+	virtual ~Create_stmt(){}
 } ;
 class Db_create: public Create_stmt
 { public:
@@ -760,6 +791,7 @@ class Show_stmt: public Sql_stmt
 	Show_stmt(int type1):Sql_stmt(10,type1){}
 	virtual void check(pugi::xml_node &root)=0;
 	virtual void execute(pugi::xml_node &root)=0;
+	virtual ~Show_stmt(){}
 };
 class Db_show: public Show_stmt
 { public:
