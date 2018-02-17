@@ -117,10 +117,10 @@ create_def_list : create_def {vector<Create_def*> *list=new vector<Create_def*>(
 create_def : col_def {	$$=new Create_def();$$->type=1;($$->x).cd=$1;}
 			| constraints {$$=new Create_def();$$->type=2;($$->x).con=$1; }
 ;
-constraints : primary_k key_k col_list_chk {$$=new Primary_key($3);}
-			| index_k col_list_chk {$$=new Index_key($2);}
-			| unique_k col_list_chk {$$=new Unique_key($2);}
-			| foreign_k key_k col_list_chk references_k name col_list_chk {$$=new Foreign_key($3,$5,$6);}
+constraints : primary_k key_k col_list_chk {$$=new Constraints(1,$3);}
+			| index_k col_list_chk {$$=new Constraints(2,$2);}
+			| unique_k col_list_chk {$$=new Constraints(3,$2);}
+			| foreign_k key_k col_list_chk references_k name col_list_chk {$$=new Constraints(4,$3,$5,$6);}
 ;
 col_def : name data_type special_list { $$=new Col_def($1,$2,$3);}					
 ; 

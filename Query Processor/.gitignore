@@ -4,3 +4,4 @@
 lex.yy.c
 sql.tab.c
 sql.tab.h
+test.cpp

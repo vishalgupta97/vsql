@@ -2,7 +2,9 @@
 #include<string>
 #include<utility>
 #include<iostream>
+#include<algorithm>
 #include "pugixml/pugixml.hpp"
+#include "blfilter.h"
 using namespace std;
 class Cond_exp
 { public:
@@ -25,16 +27,16 @@ class Where_stmt
 		if(and_list)
 		{
 			for(auto i=and_list->begin();i!=and_list->end();i++)
-				free(*i);
+				delete *i;
 			and_list->clear();
-			free(and_list);
+			delete and_list;
 		}
 		if(or_list)
 		{
 			for(auto i=or_list->begin();i!=or_list->end();i++)
-				free(*i);
+				delete *i;
 			or_list->clear();
-			free(or_list);
+			delete or_list;
 		}
 		if(first)
 			delete first;
@@ -54,17 +56,17 @@ class Orderby_stmt
 		{
 			for(auto i=clmns_list->begin();i!=clmns_list->end();i++)
 			{
-				free((*i)->first);
-				free(*i);
+				delete (*i)->first;
+				delete *i;
 			}
 			clmns_list->clear();
-			free(clmns_list);
+			delete clmns_list;
 		}
 	}
 };
 class Special_ele
 { public:
-	int type;
+	int type;//1- Not Null,2- Auto Increment,3- primary key,4- unique key,5- foreign key
 	string *tbl_name,*col_name;
 	Special_ele(int type1):Special_ele(type1,0,0){}
 	Special_ele(int type1,string *name,string *name1):type(type1),tbl_name(name),col_name(name1){}
@@ -88,79 +90,34 @@ class Col_def
 		if(list)
 		{
 			for(auto i=list->begin();i!=list->end();i++)
-				free(*i);
+				delete *i;
 			list->clear();
-			free(list);
+			delete list;
 		}
 	}
 };
 class Constraints
 { public:
 	int type;
-	Constraints(int type1):type(type){}
-};
-class Primary_key : public Constraints
-{ public:
 	vector<string*> *col_list;
-	Primary_key(vector<string*> *list):Constraints(3),col_list(list){}
-	~Primary_key(){
-		if(col_list)
-		{
-			for(auto i=col_list->begin();i!=col_list->end();i++)
-				free(*i);
-			col_list->clear();
-			free(col_list);
-		}
-	}
-};
-class Index_key : public Constraints
-{ public:
-	vector<string*> *col_list;
-	Index_key(vector<string*> *list):Constraints(3),col_list(list){}
-	~Index_key(){
-		if(col_list)
-		{
-			for(auto i=col_list->begin();i!=col_list->end();i++)
-				free(*i);
-			col_list->clear();
-			free(col_list);
-		}
-	}
-};
-class Unique_key : public Constraints
-{ public:
-	vector<string*> *col_list;
-	Unique_key(vector<string*> *list):Constraints(3),col_list(list){}
-	~Unique_key(){
-		if(col_list)
-		{
-			for(auto i=col_list->begin();i!=col_list->end();i++)
-				free(*i);
-			col_list->clear();
-			free(col_list);
-		}
-	}
-};
-class Foreign_key : public Constraints
-{ public:
-	vector<string*> *from_list;
 	vector<string*> *to_list;
 	string *tbl_name_to;
-	Foreign_key(vector<string*> *list1,string *name,vector<string*> *list2):Constraints(4),tbl_name_to(name),from_list(list1),to_list(list2){}
-	~Foreign_key(){
-		if(from_list)
+	Constraints(int type1,vector<string*> *list):type(type),col_list(list),to_list(NULL),tbl_name_to(NULL){}
+	Constraints(int type1,vector<string*> *list,string *name,vector<string*> *list1):type(type1),col_list(list),tbl_name_to(name),to_list(list1){}
+	~Constraints(){
+		if(col_list)
 		{
-			for(auto i=from_list->begin();i!=from_list->end();i++)
-				free(*i);
-			from_list->clear();
-			free(from_list);
+			for(auto i=col_list->begin();i!=col_list->end();i++)
+				delete *i;
+			col_list->clear();
+			delete col_list;
 		}
 		if(to_list)
 		{
 			for(auto i=to_list->begin();i!=to_list->end();i++)
-				free(*i);
+				delete *i;
 			to_list->clear();
-			free(to_list);
+			delete to_list;
 		}
 		if(tbl_name_to)
 			delete tbl_name_to;
@@ -203,8 +160,8 @@ class Sql_stmt
 	bool error;
 	Sql_stmt(int type1):type(type1),type_c(0){}
 	Sql_stmt(int type1,int type_c1):type(type1),type_c(type_c1){}
-	virtual void check(pugi::xml_node root)=0;
-	virtual void execute(pugi::xml_node root)=0;
+	virtual void check(pugi::xml_node &root)=0;
+	virtual void execute(pugi::xml_node &root)=0;
 };
 class Update_stmt: public Sql_stmt
 { public:
@@ -219,11 +176,11 @@ class Update_stmt: public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -240,9 +197,9 @@ class Select_stmt: public Sql_stmt
 		if(col_list)
 		{
 			for(auto i=col_list->begin();i!=col_list->end();i++)
-				free(*i);
+				delete *i;
 			col_list->clear();
-			free(col_list);
+			delete col_list;
 		}
 		if(tbl_name)
 			delete tbl_name;
@@ -251,11 +208,11 @@ class Select_stmt: public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -263,8 +220,8 @@ class Select_stmt: public Sql_stmt
 class Drop_stmt: public Sql_stmt
 { public:
 	Drop_stmt(int type1):Sql_stmt(3,type1){}
-	virtual void check(pugi::xml_node root)=0;
-	virtual void execute(pugi::xml_node root)=0;
+	virtual void check(pugi::xml_node &root)=0;
+	virtual void execute(pugi::xml_node &root)=0;
 } ;
 class Db_drop: public Drop_stmt
 { public:
@@ -275,13 +232,13 @@ class Db_drop: public Drop_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		db_node=root.child(db_name->c_str());
 		if(db_node==NULL)
 			error=true;
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		root.remove_child(db_node);
 	}
@@ -294,16 +251,16 @@ class Tbl_drop: public Drop_stmt
 		if(tbl_list)
 		{
 			for(auto i=tbl_list->begin();i!=tbl_list->end();i++)
-				free(*i);
+				delete *i;
 			tbl_list->clear();
-			free(tbl_list);
+			delete tbl_list;
 		}
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -318,11 +275,11 @@ class Idx_drop: public Drop_stmt
 		if(idx_name)
 			delete idx_name;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -335,16 +292,16 @@ class View_drop: public Drop_stmt
 		if(view_list)
 		{
 			for(auto i=view_list->begin();i!=view_list->end();i++)
-				free(*i);
+				delete *i;
 			view_list->clear();
-			free(view_list);
+			delete view_list;
 		}
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -352,8 +309,8 @@ class View_drop: public Drop_stmt
 class Create_stmt: public Sql_stmt
 { public:
 	Create_stmt(int type1):Sql_stmt(4,type1){}
-	virtual void check(pugi::xml_node root)=0;
-	virtual void execute(pugi::xml_node root)=0;
+	virtual void check(pugi::xml_node &root)=0;
+	virtual void execute(pugi::xml_node &root)=0;
 } ;
 class Db_create: public Create_stmt
 { public:
@@ -363,19 +320,18 @@ class Db_create: public Create_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		if(!db_name)
 		{
 			error=true;
 			return;
 		}
-		string db=*db_name;
 		pugi::xml_node node=root.child(db_name->c_str());
 		if(node)
 			error=true;
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		root.append_child(db_name->c_str());
 	}
@@ -384,6 +340,7 @@ class Tbl_create: public Create_stmt
 { public:
 	string *tbl_name;
 	vector<Create_def*> *list;
+	bloom_filter *bfl;
 	Tbl_create(string *name,vector<Create_def*> *list1):Create_stmt(2),tbl_name(name),list(list1){}
 	~Tbl_create(){
 		if(tbl_name)
@@ -391,18 +348,217 @@ class Tbl_create: public Create_stmt
 		if(list)
 		{
 			for(auto i=list->begin();i!=list->end();i++)
-				free(*i);
+				delete *i;
 			list->clear();
-			free(list);
+			delete list;
 		}
+		if(bfl)
+			delete bfl;
 	}
-	void check(pugi::xml_node root)
+	bool operator()(const Create_def* a,const Create_def* b)
 	{
-		
+		return a->type<b->type;
 	}
-	void execute(pugi::xml_node root)
+	void check(pugi::xml_node &curdb)
 	{
-		
+		if(!tbl_name||!list||curdb.child(tbl_name->c_str()))
+		{
+			error=true;
+			return;
+		}
+		bfl=new bloom_filter();
+		bool primary_key=false;
+		string *auto_inc=NULL;
+		std::sort(list->begin(),list->end(),*this);
+		for(int i=0;i<list->size();i++)
+		{
+			if(list->at(i)->type==1)
+			{
+				Col_def *cd=list->at(i)->x.cd;
+				if(bfl->chk_hash(cd->col_name->c_str()))
+				{
+					string s=*(cd->col_name);
+					for(int j=0;j<i;j++)
+					{
+						if(list->at(j)->type==1&&list->at(j)->x.cd->col_name->compare(s)==0)
+						{
+							error=true;
+							return;
+						}
+					}
+			    }
+				for(int i=0;i<cd->list->size();i++)
+					switch(cd->list->at(i)->type)
+					{
+						case 2:auto_inc=cd->col_name;
+						case 3:if(primary_key)
+								{
+									error=true;
+									return;
+								}
+								else
+								primary_key=true;
+							break;
+						case 5:if(curdb.child(cd->list->at(i)->tbl_name->c_str()).child(cd->list->at(i)->col_name->c_str()).attribute("unique")==NULL)
+						{
+							error=true;
+							return;
+						}
+						break;
+					}
+			} 
+			else
+			{
+				Constraints *con=list->at(i)->x.con;
+				if(con->type==1)
+				{
+					if(auto_inc!=NULL)
+					{
+						if(primary_key)
+						{
+							error=true;
+							return;
+						}
+					}
+					else if(con->col_list->size()!=1||con->col_list->at(0)->compare(*auto_inc)!=0)
+					{
+						error=true;
+						return;
+					}
+				}
+				for(int j=0;j<con->col_list->size();j++)
+				{
+					if(!bfl->chk_hash(con->col_list->at(j)->c_str()))
+					{
+						error=true;
+						return;
+					}
+				}
+				if(con->type==4)
+				{
+					if(con->col_list->size()!=con->to_list->size())
+					{
+						error=true;
+						return;
+					}
+					pugi::xml_node to_tbl=curdb.child(con->tbl_name_to->c_str());
+					if(to_tbl==NULL)
+					{
+						error=true;
+						return;
+					}
+					string s="";
+					for(int j=0;j<con->to_list->size();j++)
+					{
+						if(!bfl->chk_hash(con->col_list->at(j)->c_str())||to_tbl.child(con->to_list->at(j)->c_str())==NULL)
+						{
+							error=true;
+							return;
+						}
+						else
+						{
+							s+=*(con->to_list->at(i))+"-";
+						}
+					}
+					if(to_tbl.child(s.c_str()).attribute("unique")==NULL)
+					{
+						error=true;
+						return;
+					}
+				}
+			}
+		}	
+	}
+	void execute(pugi::xml_node &curdb)
+	{
+		pugi::xml_node tbl=curdb.append_child(tbl_name->c_str());
+		for(int i=0;i<list->size();i++)
+		{
+			if(list->at(i)->type==1)
+			{
+				Col_def* cd=list->at(i)->x.cd;
+				pugi::xml_node clmn=tbl.append_child(cd->col_name->c_str());
+				bool not_null=false,ainc=false,primary=false,unique=false,foreign=false;
+				Special_ele *se=NULL;
+				for(int j=0;j<cd->list->size();j++)
+				{
+					switch(cd->list->at(j)->type)
+					{
+						case 1:not_null=true;break;
+						case 2:ainc=true;break;
+						case 3:primary=true;not_null=true;ainc=true;unique=true;break;
+						case 4:unique=true;break;
+						case 5:foreign=true;se=cd->list->at(j);break;
+					}
+				}
+				if(unique)
+					clmn.append_attribute("unique");
+				if(primary)
+					clmn.append_attribute("primary");
+				if(ainc)
+					clmn.append_attribute("auto_inc");
+				if(not_null)
+					clmn.append_attribute("not_null");
+				if(foreign)
+				{
+					clmn.append_attribute("foreign");
+					pugi::xml_attribute atr=clmn.append_attribute("to_tbl");
+					atr.set_value(se->tbl_name->c_str());
+					atr=clmn.append_attribute("to_clmn");
+					atr.set_value(se->col_name->c_str());
+					
+				}	
+			}
+			else
+			{
+				Constraints *con=list->at(i)->x.con;
+				if(con->col_list->size()>1)
+				{
+					string s="";
+					for(int j=0;j<con->col_list->size();j++)
+					{
+						s+=*(con->col_list->at(j))+"-";
+					}
+					pugi::xml_node chld=tbl.append_child(s.c_str());
+					switch(con->type)
+					{
+						case 1:chld.append_attribute("unique");
+						chld.append_attribute("primary");
+						break;
+						case 2:chld.append_attribute("index");
+						break;
+						case 3:chld.append_attribute("unique");
+						case 4:pugi::xml_attribute atr=chld.append_attribute("foreign_tbl");
+						atr.set_value(con->tbl_name_to->c_str());
+						string y="";
+						for(int j=0;j<con->to_list->size();j++)
+							y+=*(con->to_list->at(j))+"-";
+						atr=chld.append_attribute("foreign_clmn");
+						atr.set_value(y.c_str());
+					}
+				}
+				else
+				{
+					pugi::xml_node chld=tbl.child(con->col_list->at(0)->c_str());
+					switch(con->type)
+					{
+						case 1:chld.append_attribute("unique");
+						chld.append_attribute("primary");
+						chld.append_attribute("auto_inc");
+						chld.append_attribute("not_null");
+						break;
+						case 2:chld.append_attribute("index");break;
+						case 3:chld.append_attribute("unique");
+						case 4:chld.append_attribute("foreign");
+						pugi::xml_attribute atr=chld.append_attribute("to_tbl");
+						atr.set_value(con->tbl_name_to->c_str());
+						atr=chld.append_attribute("to_clmn");
+						atr.set_value(con->to_list->at(0)->c_str());
+						break;
+					}
+				}
+			}
+		}
 	}
 };
 class Idx_create: public Create_stmt
@@ -418,16 +574,16 @@ class Idx_create: public Create_stmt
 		if(col_list)
 		{
 			for(auto i=col_list->begin();i!=col_list->end();i++)
-				free(*i);
+				delete *i;
 			col_list->clear();
-			free(col_list);
+			delete col_list;
 		}
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -445,18 +601,18 @@ class View_create: public Create_stmt
 		if(col_list)
 		{
 			for(auto i=col_list->begin();i!=col_list->end();i++)
-				free(*i);
+				delete *i;
 			col_list->clear();
-			free(col_list);
+			delete col_list;
 		}
 		if(stmt)
 			delete stmt;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -473,9 +629,9 @@ class Insert_stmt: public Sql_stmt
 		if(cols)
 		{
 			for(auto i=cols->begin();i!=cols->end();i++)
-				free(*i);
+				delete *i;
 			cols->clear();
-			free(cols);
+			delete cols;
 		}
 		if(data)
 		{
@@ -483,19 +639,19 @@ class Insert_stmt: public Sql_stmt
 			{
 				auto x=*i;
 				for(auto j=x->begin();j!=x->end();j++)
-					free(*j);
+					delete *j;
 				x->clear();
-				free(x);
+				delete x;
 			}
 			data->clear();
-			free(data);
+			delete data;
 		}
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -515,11 +671,11 @@ class Delete_stmt: public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -534,19 +690,19 @@ class Rename_stmt: public Sql_stmt
 		{
 			for(auto i=list->begin();i!=list->end();i++)
 			{
-				free((*i)->first);
-				free((*i)->second);
-				free(*i);
+				delete (*i)->first;
+				delete (*i)->second;
+				delete *i;
 			}
 			list->clear();
-			free(list);
+			delete list;
 		}
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -562,14 +718,14 @@ class Alter_stmt: public Sql_stmt
 		if(spec_list)
 		{
 			for(auto i=spec_list->begin();i!=spec_list->end();i++)
-				free(*i);
+				delete *i;
 		}
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		
 	}
@@ -583,7 +739,7 @@ class Use_stmt: public Sql_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		if(db_name==NULL)
 		{
@@ -594,25 +750,25 @@ class Use_stmt: public Sql_stmt
 		if(db_node==NULL)
 			error=true;
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
-		
+		root=db_node;
 	}
 } ;
 class Show_stmt: public Sql_stmt
 { public:
 	Show_stmt(int type1):Sql_stmt(10,type1){}
-	virtual void check(pugi::xml_node root)=0;
-	void execute(pugi::xml_node root)=0;
+	virtual void check(pugi::xml_node &root)=0;
+	virtual void execute(pugi::xml_node &root)=0;
 };
 class Db_show: public Show_stmt
 { public:
 	Db_show():Show_stmt(1){}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		std::cout<<"\n";
 		for(pugi::xml_node node:root.children())
@@ -629,7 +785,7 @@ class Tbl_show: public Show_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		if(db_name==NULL)
 		{
@@ -640,7 +796,7 @@ class Tbl_show: public Show_stmt
 		if(db_node==NULL)
 			error=true;
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		std::cout<<"\n";
 		for(pugi::xml_node node:db_node.children())
@@ -659,7 +815,7 @@ class Clmns_show: public Show_stmt
 		if(tbl_name)
 			delete tbl_name;
 	}
-	void check(pugi::xml_node root)
+	void check(pugi::xml_node &root)
 	{
 		if(db_name==NULL||tbl_name==NULL)
 		{
@@ -670,7 +826,7 @@ class Clmns_show: public Show_stmt
 		if(tbl_node==NULL)
 			error=true;
 	}
-	void execute(pugi::xml_node root)
+	void execute(pugi::xml_node &root)
 	{
 		std::cout<<"\n";
 		for(pugi::xml_node node:tbl_node.children())
