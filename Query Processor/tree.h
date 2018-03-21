@@ -83,6 +83,10 @@ class Where_stmt
 		}
 		return true;
 	}
+	vector<int> execute(pugi::xml_node tbl,libxl::Sheet* &sheet)
+	{
+		
+	}
 };
 class Orderby_stmt
 { public:
@@ -243,9 +247,10 @@ class Update_stmt: public Sql_stmt
 { public:
 	string *tbl_name;
 	Orderby_stmt *orderby_cond;
+	Where_stmt *where_cond;
 	int limit;
 	vector<pair<string*,Data_val*>* > *list;
-	Update_stmt(string *name,vector<pair<string*,Data_val*>* > *list1,Orderby_stmt *cond,int limit1):Sql_stmt(1),tbl_name(name),limit(limit1),list(list1),orderby_cond(cond){	}
+	Update_stmt(string *name,vector<pair<string*,Data_val*>* > *list1,Where_stmt *cond1,Orderby_stmt *cond,int limit1):Sql_stmt(1),tbl_name(name),limit(limit1),list(list1),where_cond(cond1),orderby_cond(cond){	}
 	~Update_stmt(){
 		if(tbl_name)
 			delete tbl_name;
@@ -254,7 +259,32 @@ class Update_stmt: public Sql_stmt
 	}
 	void check(pugi::xml_node &db_node,libxl::Book* &book)
 	{
-		
+		pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
+		if(tbl_clmn==NULL)
+		{
+			error=true;
+			error_msg="Table does not exist";
+			return;
+		}
+		for(int i=0;i<list->size();i++)
+			if(tbl_clmn.child(list->at(i)->first->c_str())==NULL)
+			{
+				error=true;
+				error_msg="Column name does not exist";
+				return;
+			}
+		if(!where_cond->check(tbl_clmn))
+		{
+			error=true;
+			error_msg="Error in Where clause";
+			return;
+		}
+		if(!orderby_cond->check(tbl_clmn))
+		{
+			error=true;
+			error_msg="Error in Orderby clause";
+			return;
+		}
 	}
 	void execute(pugi::xml_node &db_node,libxl::Book* &book)
 	{
@@ -286,7 +316,35 @@ class Select_stmt: public Sql_stmt
 	}
 	void check(pugi::xml_node &db_node,libxl::Book* &book)
 	{
-		
+		pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
+		if(tbl_clmn==NULL)
+		{
+			error=true;
+			error_msg="Table does not exist";
+			return;
+		}
+		if(col_list)
+		{
+			for(int i=0;i<col_list->size();i++)
+				if(tbl_clmn.child(col_list->at(i)->c_str())==NULL)
+				{
+					error=true;
+					error_msg="Column name does not exist";
+					return;
+				}
+		}
+		if(!where_cond->check(tbl_clmn))
+		{
+			error=true;
+			error_msg="Error in Where clause";
+			return;
+		}
+		if(!orderby_cond->check(tbl_clmn))
+		{
+			error=true;
+			error_msg="Error in Orderby clause";
+			return;
+		}
 	}
 	void execute(pugi::xml_node &db_node,libxl::Book* &book)
 	{
@@ -716,7 +774,7 @@ class Tbl_create: public Create_stmt
 };
 class Idx_create: public Create_stmt
 { public:
-	string *idx_name,*tbl_name;
+	string *idx_name,*tbl_name,s;
 	vector<string*> *col_list;
 	Idx_create(string *idx,string *tbl,vector<string*> *list):Create_stmt(3),idx_name(idx),tbl_name(tbl){}
 	~Idx_create(){
@@ -734,11 +792,47 @@ class Idx_create: public Create_stmt
 	}
 	void check(pugi::xml_node &db_node,libxl::Book* &book)
 	{
-		
+		pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
+		if(tbl_clmn==NULL)
+		{
+			error=true;
+			error_msg="Table does not exist";
+			return;
+		}
+		s="";
+		for(int i=0;i<col_list->size();i++)
+		{
+			if(tbl_clmn.child(col_list->at(i)->c_str())==NULL)
+			{
+				error=true;
+				error_msg="Column does not exist";
+				return;
+			}
+			s+=*(col_list->at(i))+"-";
+		}
+		if(db_node.child(tbl_name->c_str()).child("attributes").child(s.c_str())!=NULL)
+		{
+			error=true;
+			error_msg="Index already exist with these columns";
+			return;
+		}
 	}
 	void execute(pugi::xml_node &db_node,libxl::Book* &book)
 	{
-		
+		if(col_list->size()>1)
+		{
+			pugi::xml_node node=db_node.child(tbl_name->c_str()).child("attributes").append_child(s.c_str());
+			node.append_attribute("unique");
+			if(idx_name)
+			{
+				pugi::xml_attribute atr=node.append_attribute("name");
+				atr.set_value(idx_name->c_str());
+			}
+		}
+		else 
+		{
+			
+		}
 	}
 };
 class View_create: public Create_stmt
@@ -919,7 +1013,7 @@ class Delete_stmt: public Sql_stmt
 		if(tbl_clmn==NULL)
 		{
 			error=true;
-			error_msg="Column does not exist";
+			error_msg="Table does not exist";
 			return;
 		}
 		if(!where_cond->check(tbl_clmn))
@@ -960,11 +1054,20 @@ class Rename_stmt: public Sql_stmt
 	}
 	void check(pugi::xml_node &db_node,libxl::Book* &book)
 	{
-		
+		for(int i=0;i<list->size();i++)
+		{
+			if(db_node.child(list->at(i)->first->c_str())==NULL)
+			{
+				error=true;
+				error_msg="Table name does not exist";
+				return;
+			}
+		}
 	}
 	void execute(pugi::xml_node &db_node,libxl::Book* &book)
 	{
-		
+		for(int i=0;i<list->size();i++)
+			db_node.child(list->at(i)->first->c_str()).set_name(list->at(i)->second->c_str());
 	}
 } ;
 class Alter_stmt: public Sql_stmt

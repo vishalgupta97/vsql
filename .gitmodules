@@ -1,0 +1,3 @@
+[submodule "LibBoolEE"]
+	path = Library/LibBoolEE
+	url = https://github.com/xstreck1/LibBoolEE.git

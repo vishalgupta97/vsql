@@ -208,7 +208,7 @@ orderby_list : name order_type	{$$=new Orderby_stmt(new pair<string*,bool>($1,$2
 order_type : asc_k {$$=true;} 
 			| dec_k {$$=false;}
 ;
-update_stmt : update_k name set_k set_list orderby_stmt limit_stmt {$$=new Update_stmt($2,$4,$5,$6);}
+update_stmt : update_k name set_k set_list where_stmt orderby_stmt limit_stmt {$$=new Update_stmt($2,$4,$5,$6,$7);}
 ;
 set_list : set_single {vector<pair<string*,Data_val*>* > *list=new vector<pair<string*,Data_val*>* >(); 		  
 						list->push_back($1);$$=list;} 

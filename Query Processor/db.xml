@@ -1,4 +1,21 @@
 <?xml version="1.0"?>
 <databases>
-	<test count="0"/>
+	<market count="2">
+		<item index="1" rowcnt="4">
+			<columns>
+				<id datatype="1" index="1" unique="" primary="" auto_inc="" not_null="" />
+				<name datatype="4" index="2" />
+				<price datatype="1" index="3" />
+			</columns>
+			<attributes />
+		</item>
+		<discount index="2" rowcnt="0">
+			<columns>
+				<id datatype="1" index="1" unique="" primary="" auto_inc="" not_null="" />
+				<itemsid datatype="1" index="2" foreign="" to_tbl="items" to_clmn="id" />
+				<value datatype="2" index="3" />
+			</columns>
+			<attributes />
+		</discount>
+	</market>
 </databases>
