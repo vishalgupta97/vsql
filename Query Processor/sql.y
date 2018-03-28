@@ -13,6 +13,7 @@ Sql_stmt *stmt1=0;
 %union
 {
 	Cond_exp *cond_exp;
+	Exp *exp;
 	Where_stmt *where_stmt;
 	Orderby_stmt *orderby_stmt;
 	Col_def *col_def;
@@ -52,6 +53,9 @@ Sql_stmt *stmt1=0;
 %token <s> name datatype_k
 %token <x> number 
 
+%left and_k
+%left or_k
+
 %type <rnm_list> rename_list
 %type <set_list> set_list
 %type <order> order_type
@@ -63,7 +67,8 @@ Sql_stmt *stmt1=0;
 %type <str_list> col_list_chk name_list select_col_chk
 %type <val_set> val_set
 %type <cond_exp> cond_exp
-%type <where_stmt> where_stmt where_cond
+%type <where_stmt> where_stmt
+%type <exp> where_cond exp
 %type <orderby_stmt> orderby_stmt orderby_list
 %type <col_def> col_def
 %type <special_list> special_list special_list1
@@ -190,14 +195,22 @@ select_stmt : select_k select_col_chk from_k name where_stmt orderby_stmt limit_
 select_col_chk : '*' {$$=NULL;}
 		 | name_list 
 ;
-where_stmt : where_k where_cond {$$=$2;}
+where_stmt : where_k where_cond {$$=new Where_stmt($2);}
 			| {$$=NULL;}
 ;
-where_cond : cond_exp {$$=new Where_stmt($1);}
-			| where_cond and_k cond_exp {$$=$1;$$->and_list->push_back($3);}
-			| where_cond or_k cond_exp {$$=$1;$$->or_list->push_back($3);}
+where_cond : exp {$$=$1;}
 ;
-cond_exp : name '=' data {$$=new Cond_exp();$$->lhs=$1;$$->rhs=$3;}
+exp : exp and_k exp {$$=new And_exp($1,$3);}
+	| exp or_k exp {$$=new Or_exp($1,$3);}
+	| '(' exp ')' {$$=$2;}
+	| cond_exp {$$=$1;}
+;
+cond_exp : name '=' data {$$=new Cond_exp(1,$1,$3);}
+		| name '<' data {$$=new Cond_exp(2,$1,$3);}
+		| name '>' data {$$=new Cond_exp(3,$1,$3);}
+		| name '<' '=' data {$$=new Cond_exp(4,$1,$4);}
+		| name '>' '=' data {$$=new Cond_exp(5,$1,$4);}
+		| name '!' '=' data {$$=new Cond_exp(6,$1,$4);}
 ;
 orderby_stmt : order_k by_k orderby_list {$$=$3;}
 			| {$$=NULL;}

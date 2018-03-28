@@ -49,7 +49,7 @@ AS|as return as_k;
 TO|to return to_k;
 IN|in return in_k;
 CHANGE|change return change_k;
-"="|","|";"|"*"|"("|")"|"\'"|"." return yytext[0];
+"="|","|";"|"*"|"("|")"|"\'"|"."|"<"|">"|"!" return yytext[0];
 {name_exp} {yylval.s=new std::string(yytext,yyleng); return name;}
 {number} {yylval.x=stoi(yytext); return number;}
 "\n" return 0;

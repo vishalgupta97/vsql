@@ -21,9 +21,9 @@ int main()
 	pugi::xml_document doc;
 	pugi::xml_parse_result result=doc.load_file("db.xml");
 	pugi::xml_node root=doc.child("databases");
-	curdb=root.child("test");
+	curdb=root.child("market");
 	libxl::Book* book=xlCreateBook();
-	book->load("test.xls");
+	book->load("market.xls");
 	clock_t start,end;
 	while(true)
 	{
