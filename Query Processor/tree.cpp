@@ -1,11 +1,17 @@
 #include "tree.h"
-void Cond_exp::check(pugi::xml_node &tbl_node)
+void Cond_exp::check(Table* tbl)
 {
-	pugi::xml_node clmn=tbl_node.child(lhs->c_str());
-	if(clmn==NULL||clmn.attribute("datatype").as_int()!=rhs->type)
+	auto it=tbl->columns.find(*lhs);
+	if(it==tbl->columns.end())
+	{
+		error=true;
+		printf("Column does not exist\n");
+		return;
+	}
+	if(it->second->datatype!=rhs->type)
 	{
 			error=true;
-			printf("this one\n");
+			printf("Datatype mismatch\n");
 			return;
 	}
 	if((op_type!=1&&op_type!=6)&&(rhs->type==3||rhs->type==4))
@@ -14,7 +20,7 @@ void Cond_exp::check(pugi::xml_node &tbl_node)
 		printf("that one\n");
 		return;
 	}
-	col_idx=clmn.attribute("index").as_int();
+	col_idx=it->second->idx;
 }
 std::string Cond_exp::gen(int &cnt,Where_stmt* stmt)
 {
@@ -23,14 +29,14 @@ std::string Cond_exp::gen(int &cnt,Where_stmt* stmt)
 	cnt++;
 	return s;
 }
-void And_exp::check(pugi::xml_node &tbl_node)
+void And_exp::check(Table* tbl)
 {
-	lhs->check(tbl_node);
+	lhs->check(tbl);
 	if(lhs->error)
 		error=true;
 	else
 	{
-		rhs->check(tbl_node);
+		rhs->check(tbl);
 		if(rhs->error)
 			error=true;
 	}
@@ -57,14 +63,14 @@ std::string And_exp::gen(int &cnt,Where_stmt* stmt)
 		s+=rhs->gen(cnt,stmt);
 	return s;
 }
-void Or_exp::check(pugi::xml_node &tbl_node)
+void Or_exp::check(Table* tbl)
 {
-	lhs->check(tbl_node);
+	lhs->check(tbl);
 	if(lhs->error)
 		error=true;
 	else
 	{
-		rhs->check(tbl_node);
+		rhs->check(tbl);
 		if(rhs->error)
 			error=true;
 	}
@@ -91,14 +97,14 @@ std::string Or_exp::gen(int &cnt,Where_stmt* stmt)
 		s+=rhs->gen(cnt,stmt);
 	return s;
 }
-bool Where_stmt::check(pugi::xml_node tbl_clmns)
+bool Where_stmt::check(Table* tbl)
 {
-	exp->check(tbl_clmns);
+	exp->check(tbl);
 	return exp->error;
 }
-void Where_stmt::execute(pugi::xml_node tbl_node,libxl::Sheet* &sheet)
+void Where_stmt::execute(Table* tbl,int limit)
 {
-	int cnt=0,rowno=tbl_node.attribute("rowcnt").as_int();
+	int cnt=0,rowno=tbl->rowcnt;
 	std::string s=exp->gen(cnt,this);
 	LibBoolEE::Vals vals;
 	for(int i=0;i<cnt;i++)
@@ -112,55 +118,55 @@ void Where_stmt::execute(pugi::xml_node tbl_node,libxl::Sheet* &sheet)
 			{
 				case 1:switch(exps[j]->rhs->type)
 				{
-					case 1:temp=sheet->readNum(i,exps[j]->col_idx)==exps[j]->rhs->x.int_val;
+					case 1:temp=tbl->sheet->readNum(i,exps[j]->col_idx)==exps[j]->rhs->x.int_val;
 					break;
-					case 2:temp=sheet->readNum(i,exps[j]->col_idx)==exps[j]->rhs->x.dbl_val;
+					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)==exps[j]->rhs->x.dbl_val;
 					break;
 					case 3:
-					case 4:temp=exps[j]->rhs->x.s->compare(sheet->readStr(i,exps[j]->col_idx))==0;
+					case 4:temp=exps[j]->rhs->x.s->compare(tbl->sheet->readStr(i,exps[j]->col_idx))==0;
 					break;
 				}
 				break;
 				case 2:switch(exps[j]->rhs->type)
 				{
-					case 1:temp=sheet->readNum(i,exps[j]->col_idx)<exps[j]->rhs->x.int_val;
+					case 1:temp=tbl->sheet->readNum(i,exps[j]->col_idx)<exps[j]->rhs->x.int_val;
 					break;
-					case 2:temp=sheet->readNum(i,exps[j]->col_idx)<exps[j]->rhs->x.dbl_val;
+					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)<exps[j]->rhs->x.dbl_val;
 					break;
 				}
 				break;
 				case 3:switch(exps[j]->rhs->type)
 				{
-					case 1:temp=sheet->readNum(i,exps[j]->col_idx)>exps[j]->rhs->x.int_val;
+					case 1:temp=tbl->sheet->readNum(i,exps[j]->col_idx)>exps[j]->rhs->x.int_val;
 					break;
-					case 2:temp=sheet->readNum(i,exps[j]->col_idx)>exps[j]->rhs->x.dbl_val;
+					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)>exps[j]->rhs->x.dbl_val;
 					break;
 				}
 				break;
 				case 4:switch(exps[j]->rhs->type)
 				{
-					case 1:temp=sheet->readNum(i,exps[j]->col_idx)<=exps[j]->rhs->x.int_val;
+					case 1:temp=tbl->sheet->readNum(i,exps[j]->col_idx)<=exps[j]->rhs->x.int_val;
 					break;
-					case 2:temp=sheet->readNum(i,exps[j]->col_idx)<=exps[j]->rhs->x.dbl_val;
+					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)<=exps[j]->rhs->x.dbl_val;
 					break;
 				}
 				break;
 				case 5:switch(exps[j]->rhs->type)
 				{
-					case 1:temp=sheet->readNum(i,exps[j]->col_idx)>=exps[j]->rhs->x.int_val;
+					case 1:temp=tbl->sheet->readNum(i,exps[j]->col_idx)>=exps[j]->rhs->x.int_val;
 					break;
-					case 2:temp=sheet->readNum(i,exps[j]->col_idx)>=exps[j]->rhs->x.dbl_val;
+					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)>=exps[j]->rhs->x.dbl_val;
 					break;
 				}
 				break;
 				case 6:switch(exps[j]->rhs->type)
 				{
-					case 1:temp=sheet->readNum(i,exps[j]->col_idx)!=exps[j]->rhs->x.int_val;
+					case 1:temp=tbl->sheet->readNum(i,exps[j]->col_idx)!=exps[j]->rhs->x.int_val;
 					break;
-					case 2:temp=sheet->readNum(i,exps[j]->col_idx)!=exps[j]->rhs->x.dbl_val;
+					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)!=exps[j]->rhs->x.dbl_val;
 					break;
 					case 3:
-					case 4:temp=exps[j]->rhs->x.s->compare(sheet->readStr(i,exps[j]->col_idx))!=0;
+					case 4:temp=exps[j]->rhs->x.s->compare(tbl->sheet->readStr(i,exps[j]->col_idx))!=0;
 					break;
 				}
 				break;
@@ -168,24 +174,28 @@ void Where_stmt::execute(pugi::xml_node tbl_node,libxl::Sheet* &sheet)
 			vals["t"+to_string(j)]=temp;
 		}
 		if(LibBoolEE::resolve(s,vals))
+		{
 			res.push_back(i);
+			if(limit>0&&res.size()==limit)
+				break;
+		}
 	}
 }
-bool Orderby_stmt::check(pugi::xml_node tbl_clmn)
+bool Orderby_stmt::check(Table* tbl)
 {
 	for(int i=0;i<clmns_list->size();i++)
 	{
-		pugi::xml_node clmn=tbl_clmn.child(clmns_list->at(i)->first->c_str());
-		if(clmn)
-			index_type.push_back({clmn.attribute("index").as_int(),clmn.attribute("datatype").as_int()});
+		auto it=tbl->columns.find(clmns_list->at(i)->first->c_str());
+		if(it!=tbl->columns.end())
+			index_type.push_back({it->second->idx,it->second->datatype});
 		else
 			return true;
 	}
 	return false;
 }
-void Orderby_stmt::execute(libxl::Sheet* &sheet)
+void Orderby_stmt::execute(Table* tbl)
 {
-	this->sheet=sheet;
+	this->sheet=tbl->sheet;
 	sort(res.begin(),res.end(),[this](int i, int j){
 		double val,val1;
 		int diff;
@@ -216,54 +226,58 @@ void Orderby_stmt::execute(libxl::Sheet* &sheet)
 		return false;
 	});
 }
-void Update_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Update_stmt::check(Data *d)
 {
-	pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
-	if(tbl_clmn==NULL)
+	Database* db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	if(it==db->tables.end())
 	{
 		error=true;
 		error_msg="Table does not exist";
 		return;
 	}
+	Table* tbl=it->second;
 	for(int i=0;i<list->size();i++)
-		if(tbl_clmn.child(list->at(i)->first->c_str())==NULL)
+		if(tbl->columns.find(*(list->at(i)->first))==tbl->columns.end())
 		{
 			error=true;
 			error_msg="Column name does not exist";
 			return;
 		}
-	if(where_cond->check(tbl_clmn))
+	if(where_cond&&where_cond->check(tbl))
 	{
 		error=true;
 		error_msg="Error in Where clause";
 		return;
 	}
-	if(orderby_cond->check(tbl_clmn))
+	if(orderby_cond&&orderby_cond->check(tbl))
 	{
 		error=true;
 		error_msg="Error in Orderby clause";
 		return;
 	}
 }
-void Update_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Update_stmt::execute(Data *d)
 {
 	
 }
-void Select_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Select_stmt::check(Data *d)
 {
-	pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
-	if(tbl_clmn==NULL)
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	if(it==db->tables.end())
 	{
 		error=true;
 		error_msg="Table does not exist";
 		return;
 	}
+	Table* tbl=it->second;
 	if(col_list)
 	{
 		for(int i=0;i<col_list->size();i++)
 		{
-			pugi::xml_node clmn=tbl_clmn.child(col_list->at(i)->c_str());
-			if(clmn==NULL)
+			auto clmn=tbl->columns.find(*(col_list->at(i)));
+			if(clmn==tbl->columns.end())
 			{
 				error=true;
 				error_msg="Column name does not exist";
@@ -271,47 +285,44 @@ void Select_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
 			}
 			else
 			{
-				index_type.push_back({clmn.attribute("index").as_int(),clmn.attribute("datatype").as_int()});
+				index_type.push_back({clmn->second->idx,clmn->second->datatype});
 			}
 		}
 	}
-	if(where_cond&&where_cond->check(tbl_clmn))
+	if(where_cond&&where_cond->check(tbl))
 	{
 		error=true;
 		error_msg="Error in Where clause";
 		return;
 	}
-	if(orderby_cond&&orderby_cond->check(tbl_clmn))
+	if(orderby_cond&&orderby_cond->check(tbl))
 	{
 		error=true;
 		error_msg="Error in Orderby clause";
 		return;
 	}
 }
-void Select_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Select_stmt::execute(Data *d)
 {
-	pugi::xml_node tbl=db_node.child(tbl_name->c_str());
-	int rowcnt=tbl.attribute("rowcnt").as_int(),tbl_idx=tbl.attribute("index").as_int();
-	libxl::Sheet* sheet=book->getSheet(tbl_idx);
-	if(sheet)
-	{
-		
-	}
-	else
-	{
-		printf("%d no\n",tbl_idx);
-		return;
-	}
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	Table* tbl=it->second;
+	int rowcnt=tbl->rowcnt;
+	libxl::Sheet* sheet=tbl->sheet;
 	vector<int> res;
-	for(int i=1;i<=rowcnt;i++)
-		res.push_back(i);
+	for(auto i=tbl->rows.begin();i!=tbl->rows.end();i++)
+	{
+		int idx=i->first,length=i->second;
+		for(int j=idx;j<idx+length;j++)
+			res.push_back(j);
+	}
 	if(where_cond)
 	{
-		where_cond->execute(tbl,sheet);
+		where_cond->execute(tbl,limit);
 		if(orderby_cond)
 		{
 			orderby_cond->res=where_cond->res;
-			orderby_cond->execute(sheet);
+			orderby_cond->execute(tbl);
 			res=orderby_cond->res;
 		}
 		else
@@ -320,18 +331,21 @@ void Select_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
 	else if(orderby_cond)
 	{
 		orderby_cond->res=res;
-		orderby_cond->execute(sheet);
+		orderby_cond->execute(tbl);
 		res=orderby_cond->res;
 	}
-	pugi::xml_node tbl_clmn=tbl.child("columns");
-	int cols_count=tbl_clmn.attribute("count").as_int();
+	int cols_count=tbl->col_cnt;
 	if(!col_list)
 	{
-		for(auto i=tbl_clmn.begin();i!=tbl_clmn.end();i++)
+		pugi::xml_node clmns=tbl->node.child("columns");
+		for(auto i=clmns.begin();i!=clmns.end();i++)
 		{
-			index_type.push_back({(*i).attribute("index").as_int(),(*i).attribute("datatype").as_int()});
+			Column* clmn=tbl->columns[i->name()];
+			index_type.push_back({clmn->idx,clmn->datatype});
 		}
 	}
+	if(limit>0&&res.size()>limit)
+		res.resize(limit);
 	for(int i=0;i<res.size();i++)
 	{
 		for(int j=0;j<index_type.size();j++)
@@ -347,92 +361,96 @@ void Select_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
 		printf("\n");
 	}
 }
-void Db_drop::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Db_drop::check(Data *d)
 {
-	if(db_name==NULL)
+	Root *root=static_cast<Root*>(d);
+	auto it=root->databases.find(*db_name);
+	if(it==root->databases.end())
 	{
 		error=true;
-		error_msg="Database name not provided";
+		error_msg="Database does not exist";
 		return;
 	}
-	if(curdb&&db_name->compare(curdb.name())==0)
+	if(curdb==it->second)
 	{
 		error=true;
 		error_msg="Cannot drop current db";
 		return;
 	}
-	n_db_node=db_node.child(db_name->c_str());
-	if(n_db_node==NULL)
-	{
-		error=true;
-		error_msg="Database name does not exist";
-	}
 }
-void Db_drop::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Db_drop::execute(Data *d)
 {
-	remove(db_name->append(".xls").c_str());
-	db_node.remove_child(n_db_node);
+	Root *root=static_cast<Root*>(d);
+	auto it=root->databases.find(*db_name);
+	string s=it->first;
+	remove(s.append(".xls").c_str());
+	root->node.remove_child(it->second->node);
+	root->databases.erase(it);
 }
-void Tbl_drop::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Tbl_drop::check(Data *d)
 {
+	Database *db=static_cast<Database*>(d);
 	for(int i=0;i<tbl_list->size();i++)
-		if(db_node.child(tbl_list->at(i)->c_str())==NULL)
+		if(db->tables.find(*(tbl_list->at(i)))==db->tables.end())
 		{
 			error=true;
 			error_msg="Table name does not exist";
 			return;
 		}
 }
-void Tbl_drop::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Tbl_drop::execute(Data *d)
 {
+	Database *db=static_cast<Database*>(d);
 	for(int i=0;i<tbl_list->size();i++)
 	{
-		book->delSheet(atoi(db_node.child(tbl_list->at(i)->c_str()).attribute("index").value()));
-		db_node.remove_child(tbl_list->at(i)->c_str());
+		auto it=db->tables.find(*(tbl_list->at(i)));
+		db->book->delSheet(it->second->idx);
+		db->node.remove_child(it->second->node);
+		db->tables.erase(it);
+		db->cnt--;
 	}
+	db->node.attribute("count").set_value(db->cnt);
 }
-void Idx_drop::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Idx_drop::check(Data *d)
 {
 	
 }
-void Idx_drop::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Idx_drop::execute(Data *d)
 {
 	
 }
-void View_drop::check(pugi::xml_node &db_node,libxl::Book* &book)
+void View_drop::check(Data *d)
 {
 	
 }
-void View_drop::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void View_drop::execute(Data *d)
 {
 	
 }
-void Db_create::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Db_create::check(Data *d)
 {
-	if(!db_name)
-	{
-		error=true;
-		error_msg="Database name not provided";
-		return;
-	}
-	pugi::xml_node node=db_node.child(db_name->c_str());
-	if(node)
+	Root *root=static_cast<Root*>(d);
+	auto it=root->databases.find(*db_name);
+	if(it!=root->databases.end())
 	{
 		error=true;
 		error_msg="Database already exist";
 	}
 }
-void Db_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Db_create::execute(Data *d)
 {
-	libxl::Book* n_book=xlCreateBook();
-	pugi::xml_node node=db_node.append_child(db_name->c_str());
-	n_book->addSheet(string("Sheet1").c_str());
-	n_book->save(db_name->append(".xls").c_str());
-	n_book->release();
-	pugi::xml_attribute atr=node.append_attribute("count");
-	atr.set_value("0");
+	Root *root=static_cast<Root*>(d);
+	Database *db=new Database();
+	db->name=*db_name;
+	db->book=xlCreateBook();
+	db->node=root->node.append_child(db_name->c_str());
+	db->book->addSheet(string("Sheet1").c_str());
+	string s=db->name;
+	db->book->save(s.append(".xls").c_str());
+	db->node.append_attribute("count").set_value(0);
+	root->databases.insert({*db_name,db});
 }
-void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Tbl_create::check(Data *d)
 {
 	if(!tbl_name)
 	{
@@ -446,7 +464,8 @@ void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 		error_msg="Table defination not provided";
 		return;
 	}
-	if(db_node.child(tbl_name->c_str()))
+	Database *db=static_cast<Database*>(d);
+	if(db->tables.find(*tbl_name)!=db->tables.end())
 	{
 		error=true;
 		error_msg="Table already exist";
@@ -481,7 +500,14 @@ void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 				for(int i=0;i<cd->list->size();i++)
 					switch(cd->list->at(i)->type)
 					{
-						case 2:auto_inc=cd->col_name;
+						case 2:if(auto_inc==NULL)auto_inc=cd->col_name;
+						else 
+						{
+							error=true;
+							error_msg="Two Auto Increment found";
+							return;
+						}
+						break;
 						case 3:if(primary_key)
 								{
 									error=true;
@@ -491,7 +517,20 @@ void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 								else
 								primary_key=true;
 							break;
-						case 5:if(db_node.child(cd->list->at(i)->tbl_name->c_str()).child("columns").child(cd->list->at(i)->col_name->c_str()).attribute("unique")==NULL)
+						case 5:
+						auto it=db->tables.find(*(cd->list->at(i)->tbl_name));
+						if(it==db->tables.end())
+						{
+							error=true;
+							error_msg="Foreign key table not found";
+						}
+						auto it1=it->second->columns.find(*(cd->list->at(i)->col_name));
+						if(it1==it->second->columns.end())
+						{
+							error=true;
+							error_msg="Foreign key column not found";
+						}
+						if(!(it1->second->attr[0]))
 						{
 							error=true;
 							error_msg="Foreign Key Column in not unique";
@@ -539,17 +578,18 @@ void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 					error_msg="Foreign Key list does not match Primary Key list";
 					return;
 				}
-				pugi::xml_node to_tbl=db_node.child(con->tbl_name_to->c_str());
-				if(to_tbl==NULL)
+				auto it=db->tables.find(*(con->tbl_name_to));
+				if(it==db->tables.end())
 				{
 					error=true;
 					error_msg="Foreign Table does not exist";
 					return;
 				}
+				Table *to_tbl=it->second;
 				string s="";
 				for(int j=0;j<con->to_list->size();j++)
 				{
-					if(!bfl->chk_hash(con->col_list->at(j)->c_str())||to_tbl.child(con->to_list->at(j)->c_str())==NULL)
+					if(!bfl->chk_hash(con->col_list->at(j)->c_str())||to_tbl->columns.find(*(con->to_list->at(j)))==to_tbl->columns.end())
 					{
 						error=true;
 						error_msg="Column does not exist";
@@ -557,10 +597,12 @@ void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 					}
 					else
 					{
-						s+=*(con->to_list->at(i))+"-";
+						s+=*(con->to_list->at(j))+"-";
 					}
 				}
-				if(to_tbl.child(s.c_str()).attribute("unique")==NULL)
+				if(con->to_list->size()==1)
+					s=s.substr(0,s.length()-1);
+				if(to_tbl->keys.find(s)==to_tbl->keys.end())
 				{
 					error=true;
 					error_msg="Foreign Key Columns are not unique";
@@ -570,17 +612,27 @@ void Tbl_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 		}
 	}	
 }
-void Tbl_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Tbl_create::execute(Data *d)
 {
-	pugi::xml_node tbl=db_node.append_child(tbl_name->c_str());
-	pugi::xml_attribute atr=tbl.append_attribute("index");
-	atr.set_value(db_node.attribute("count").as_int()+1);
-	db_node.attribute("count").set_value(atr.value());
-	atr=tbl.append_attribute("rowcnt");
-	atr.set_value("0");
-	book->addSheet(tbl_name->c_str());
-	pugi::xml_node clmns=tbl.append_child("columns");
-	pugi::xml_node attrs=tbl.append_child("attributes");
+	Database *db=static_cast<Database*>(d);
+	Table *tbl=new Table();
+	db->tables.insert({*tbl_name,tbl});
+	printf("here2\n");
+	tbl->name=*tbl_name;
+	tbl->node=db->node.append_child(tbl_name->c_str());
+	db->cnt++;
+	db->node.attribute("count").set_value(db->cnt);
+	printf("here3\n");
+	tbl->node.append_attribute("index").set_value(db->cnt);
+	tbl->idx=db->cnt;
+	tbl->node.append_attribute("rowcnt").set_value("0");
+	tbl->sheet=db->book->addSheet(tbl_name->c_str());
+	printf("here4\n");
+	pugi::xml_node clmns=tbl->node.append_child("columns");
+	pugi::xml_node unique_key=tbl->node.append_child("unique");
+	pugi::xml_node foreign_key=tbl->node.append_child("foreign");
+	pugi::xml_node primary_key=tbl->node.append_child("primary");
+	tbl->node.append_child("rows");
 	int col_cnt=0;
 	for(int i=0;i<list->size();i++)
 	{
@@ -588,11 +640,14 @@ void Tbl_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
 		{
 			col_cnt++;
 			Col_def* cd=list->at(i)->x.cd;
-			pugi::xml_node clmn=clmns.append_child(cd->col_name->c_str());
-			pugi::xml_attribute atr_type=clmn.append_attribute("datatype");
-			atr_type.set_value(datatype_vals[*(cd->datatype)].c_str());
-			pugi::xml_attribute atr_index=clmn.append_attribute("index");
-			atr_index.set_value(to_string(i+1).c_str());
+			Column *clmn=new Column();
+			clmn->name=*(cd->col_name);
+			tbl->columns.insert({clmn->name,clmn});
+			clmn->node=clmns.append_child(cd->col_name->c_str());
+			clmn->node.append_attribute("datatype").set_value(datatype_vals[*(cd->datatype)]);
+			clmn->datatype=datatype_vals[*(cd->datatype)];
+			clmn->node.append_attribute("index").set_value(i+1);
+			clmn->idx=i+1;
 			bool not_null=false,ainc=false,primary=false,unique=false,foreign=false;
 			Special_ele *se=NULL;
 			if(cd->list)
@@ -601,36 +656,49 @@ void Tbl_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
 				{
 					switch(cd->list->at(j)->type)
 					{
-						case 1:not_null=true;break;
+						case 1:not_null=true;
+						break;
 						case 2:ainc=true;break;
-						case 3:primary=true;not_null=true;ainc=true;unique=true;break;
+						case 3:primary=true;not_null=true;unique=true;break;
 						case 4:unique=true;break;
 						case 5:foreign=true;se=cd->list->at(j);break;
 					}
 				}
 			}
 			if(unique)
-				clmn.append_attribute("unique");
+			{
+				clmn->node.append_attribute("unique");
+				clmn->attr[0]=true;
+				tbl->keys[clmn->name];
+				if(!primary)
+					unique_key.append_child(clmn->name.c_str());
+			}
 			if(primary)
 			{
-				clmn.append_attribute("primary");
-				if(atr_type.as_int()==1)
-				{
-					tbl.append_attribute("pkcnt").set_value(0);//primary key counter
-				}
+				clmn->node.append_attribute("primary");
+				clmn->attr[1]=true;
+				tbl->primary_name=clmn->name;
+				primary_key.append_child(clmn->name.c_str());
 			}
 			if(ainc)
-				clmn.append_attribute("auto_inc");
+			{
+				clmn->node.append_attribute("auto_inc");
+				clmn->attr[2]=true;
+				tbl->node.append_attribute("pkcnt").set_value(0);//primary key counter
+			}
 			if(not_null)
-				clmn.append_attribute("not_null");
+			{
+				clmn->node.append_attribute("not_null");
+				clmn->attr[3]=true;
+			}
 			if(foreign)
 			{
-				clmn.append_attribute("foreign");
-				pugi::xml_attribute atr=clmn.append_attribute("to_tbl");
-				atr.set_value(se->tbl_name->c_str());
-				atr=clmn.append_attribute("to_clmn");
-				atr.set_value(se->col_name->c_str());
-				
+				clmn->node.append_attribute("foreign");
+				clmn->attr[4]=true;
+				pugi::xml_node foreign_node=foreign_key.append_child(clmn->name.c_str());
+				foreign_node.append_attribute("to_tbl").set_value(se->tbl_name->c_str());
+				foreign_node.append_attribute("to_clmn").set_value(se->col_name->c_str());
+				tbl->foreign_keys.insert({clmn->name,{*(se->tbl_name),*(se->col_name)}});
 			}	
 		}
 		else
@@ -643,65 +711,82 @@ void Tbl_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
 				{
 					s+=*(con->col_list->at(j))+"-";
 				}
-				pugi::xml_node chld=attrs.append_child(s.c_str());
 				switch(con->type)
 				{
-					case 1:chld.append_attribute("unique");
-					chld.append_attribute("primary");
+					case 1:
+					primary_key.append_child(s.c_str());
+					tbl->primary_name=s;
 					break;
-					case 2:chld.append_attribute("index");
+					case 2:unique_key.append_child(s.c_str());
+					tbl->keys[s];
 					break;
-					case 3:chld.append_attribute("unique");
-					case 4:pugi::xml_attribute atr=chld.append_attribute("foreign_tbl");
-					atr.set_value(con->tbl_name_to->c_str());
+					case 3:unique_key.append_child(s.c_str());
+					tbl->keys[s];
+					break;
+					case 4:
+					pugi::xml_node foreign_node=foreign_key.append_child (s.c_str());
+					foreign_node.append_attribute("foreign_tbl").set_value(con->tbl_name_to->c_str());
 					string y="";
 					for(int j=0;j<con->to_list->size();j++)
 						y+=*(con->to_list->at(j))+"-";
-					atr=chld.append_attribute("foreign_clmn");
-					atr.set_value(y.c_str());
+					foreign_node.append_attribute("foreign_clmn").set_value(y.c_str());
+					tbl->foreign_keys[s]={*(con->tbl_name_to),y};
+					break;
 				}
 			}
 			else
 			{
-				pugi::xml_node chld=tbl.child(con->col_list->at(0)->c_str());
+				Column *clmn=(tbl->columns.find(*(con->col_list->at(0)))->second);
 				switch(con->type)
 				{
-					case 1:chld.append_attribute("unique");
-					chld.append_attribute("primary");
-					chld.append_attribute("auto_inc");
-					chld.append_attribute("not_null");
-					if(chld.attribute("datatype").as_int()==1)
-					{
-						tbl.append_attribute("pkcnt").set_value(0);//primary key counter
-					}
+					case 1:
+					clmn->node.append_attribute("unique");
+					clmn->node.append_attribute("primary");
+					clmn->node.append_attribute("not_null");
+					clmn->attr[0]=true;
+					clmn->attr[1]=true;
+					clmn->attr[3]=true;
+					primary_key.append_child(clmn->name.c_str());
+					tbl->primary_name=clmn->name;
 					break;
-					case 2:chld.append_attribute("index");break;
-					case 3:chld.append_attribute("unique");
-					case 4:chld.append_attribute("foreign");
-					pugi::xml_attribute atr=chld.append_attribute("to_tbl");
-					atr.set_value(con->tbl_name_to->c_str());
-					atr=chld.append_attribute("to_clmn");
-					atr.set_value(con->to_list->at(0)->c_str());
+					case 2:clmn->node.append_attribute("index").set_value(0);
+					unique_key.append_child(clmn->name.c_str());
+					tbl->keys[clmn->name];
+					break;
+					case 3:clmn->node.append_attribute("unique");
+					clmn->attr[0]=true;
+					unique_key.append_child(clmn->name.c_str());
+					tbl->keys[clmn->name];
+					break;
+					case 4:clmn->node.append_attribute("foreign");
+					clmn->attr[4]=true;
+					pugi::xml_node foreign_node=foreign_key.append_child (clmn->name.c_str());
+					foreign_node.append_attribute("to_tbl").set_value(con->tbl_name_to->c_str());
+					foreign_node.append_attribute("to_clmn").set_value(con->to_list->at(0)->c_str());
+					tbl->foreign_keys.insert({clmn->name,{*(con->tbl_name_to),*(con->to_list->at(0))}});
 					break;
 				}
 			}
 		}
 	}
-	clmns.append_attribute("count").set_value(col_cnt);
+	tbl->node.append_attribute("count").set_value(col_cnt);
+	tbl->col_cnt=col_cnt;
 }
-void Idx_create::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Idx_create::check(Data *d)
 {
-	pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
-	if(tbl_clmn==NULL)
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	if(it==db->tables.end())
 	{
 		error=true;
 		error_msg="Table does not exist";
 		return;
 	}
+	Table *tbl=it->second;
 	s="";
 	for(int i=0;i<col_list->size();i++)
 	{
-		if(tbl_clmn.child(col_list->at(i)->c_str())==NULL)
+		if(tbl->columns.find(*(col_list->at(i)))==tbl->columns.end())
 		{
 			error=true;
 			error_msg="Column does not exist";
@@ -709,72 +794,122 @@ void Idx_create::check(pugi::xml_node &db_node,libxl::Book* &book)
 		}
 		s+=*(col_list->at(i))+"-";
 	}
-	if(db_node.child(tbl_name->c_str()).child("attributes").child(s.c_str())!=NULL)
+	if(col_list->size()==1)
+		s=s.substr(0,s.length()-1);
+	if(tbl->keys.find(s.c_str())!=tbl->keys.end())
 	{
 		error=true;
 		error_msg="Index already exist with these columns";
 		return;
 	}
 }
-void Idx_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Idx_create::execute(Data *d)
 {
+	Database *db=static_cast<Database*>(d);
+	Table *tbl=db->tables[*tbl_name];
 	if(col_list->size()>1)
 	{
-		pugi::xml_node node=db_node.child(tbl_name->c_str()).child("attributes").append_child(s.c_str());
+		pugi::xml_node node=tbl->node.child("attributes").append_child(s.c_str());
 		node.append_attribute("unique");
-		if(idx_name)
-		{
-			pugi::xml_attribute atr=node.append_attribute("name");
-			atr.set_value(idx_name->c_str());
-		}
+		tbl->keys[s];
 	}
-	else 
+	else
 	{
-		
+		tbl->node.child(s.c_str()).append_attribute("unique");
+		tbl->keys[s];
 	}
 }
-void View_create::check(pugi::xml_node &db_node,libxl::Book* &book)
+void View_create::check(Data *d)
 {
 	
 }
-void View_create::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void View_create::execute(Data *d)
 {
 	
 }
-void Insert_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Insert_stmt::check(Data *d)
 {
-	tbl=db_node.child(tbl_name->c_str());
-	pugi::xml_node tbl_clmn=tbl.child("columns");
-	if(tbl_clmn==NULL)
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	if(it==db->tables.end())
 	{
 		error=true;
-		error_msg="Column does not exist";
+		error_msg="Table does not exist";
 		return;
 	}
+	Table* tbl=it->second;
 	if(cols==NULL)
 	{
-		for(auto i=tbl_clmn.begin();i!=tbl_clmn.end();i++)
+		pugi::xml_node clmn=tbl->node.child("columns");
+		for(auto i=clmn.begin();i!=clmn.end();i++)
 		{
-			if((*i).attribute("primary")==NULL)
+			Column *clmn=tbl->columns[i->name()];
+			if(clmn->attr[2])
 			{
-				checker.push_back((*i).attribute("datatype").as_int());
-				indexes.push_back((*i).attribute("index").as_int());
+				auto_inc=clmn;
 			}
+			else if(clmn->attr[1])
+				checker.push_back({clmn->idx,clmn->datatype,&(tbl->primary),false});
+			else if(clmn->attr[4])
+			{
+				Table* tbl1=db->tables[tbl->foreign_keys[clmn->name].first];
+				Column* clmn1=tbl1->columns[tbl->foreign_keys[clmn->name].second];
+				if(clmn1->attr[1])
+				{
+					checker.push_back({clmn->idx,clmn->datatype,&(tbl1->primary),true});
+				}
+				else
+					checker.push_back({clmn->idx,clmn->datatype,&(tbl1->keys[clmn1->name]),true});
+			}
+			else if(clmn->attr[0])
+				checker.push_back({clmn->idx,clmn->datatype,&(tbl->keys[clmn->name]),false});
+			else
+				checker.push_back({clmn->idx,clmn->datatype,NULL,false});
 		}
 	}
 	else
 	{
+		bool primary_given=false;
 		for(int i=0;i<cols->size();i++)
 		{
-			pugi::xml_node clmn=tbl_clmn.child(cols->at(i)->c_str());
-			if(clmn==NULL)
+			auto it=tbl->columns.find(*(cols->at(i)));
+			if(it==tbl->columns.end())
 			{
 				error=true;
 				error_msg="Columns does not exist";
 				return;
 			}
-			checker.push_back(clmn.attribute("datatype").as_int());
-			indexes.push_back(clmn.attribute("index").as_int());
+			Column *clmn=it->second;
+			if(clmn->attr[2])
+			{
+				error=true;
+				error_msg="Cannot insert into Auto increment Column";
+				return;
+			}
+			else if(clmn->attr[1])
+			{
+				checker.push_back({clmn->idx,clmn->datatype,&(tbl->primary),false});
+				primary_given=true;
+			}
+			else if(clmn->attr[4])
+			{
+				Table* tbl1=db->tables[tbl->foreign_keys[clmn->name].first];
+				Column* clmn1=tbl1->columns[tbl->foreign_keys[clmn->name].second];
+				if(clmn1->attr[1])
+					checker.push_back({clmn->idx,clmn->datatype,&(tbl1->primary),true});
+				else
+					checker.push_back({clmn->idx,clmn->datatype,&(tbl1->keys[clmn1->name]),true});
+			}
+			else if(clmn->attr[0])
+				checker.push_back({clmn->idx,clmn->datatype,&(tbl->keys[clmn->name]),false});
+			else
+				checker.push_back({clmn->idx,clmn->datatype,NULL,false});
+		}
+		if(!primary_given)
+		{
+			error=true;
+			error_msg="Primary Key data not given";
+			return;
 		}
 	}
 	for(int i=0;i<data->size();i++)
@@ -788,76 +923,234 @@ void Insert_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
 		}
 		for(int j=0;j<checker.size();j++)
 		{
-			if(checker[j]!=vec->at(j)->type)
+			if(checker[j].datatype!=vec->at(j)->type)
 			{
 				error=true;
 				error_msg="Datatype mismatch";
 				return;
 			}
+			if(checker[j].key)
+			{
+				string s;
+				switch(vec->at(j)->type)
+				{
+					case 1:s=to_string(vec->at(j)->x.int_val);
+					break;
+					case 2:s=to_string(vec->at(j)->x.dbl_val);
+					break;
+					case 3:
+					case 4:s=*(vec->at(j)->x.s);
+					break;
+				}
+				auto it1=checker[j].key->find(s);
+				if(!checker[j].foreign)
+				{
+					if(it1!=checker[j].key->end())
+					{
+						error=true;
+						error_msg="Value already present";
+						return;
+					}
+				}
+				else
+				{
+					if(it1==checker[j].key->end())
+					{
+						error=true;
+						error_msg="Foreign key not found";
+						return;
+					}
+				}
+			}
 		}
 	}
-	rowno=tbl.attribute("rowcnt").as_int();
-	pkcnt=tbl.attribute("pkcnt").as_int();
-	tbl_idx=tbl.attribute("index").as_int();
-	pkindex=tbl_clmn.find_child_by_attribute("auto_inc","").attribute("index").as_int();
-	printf("%d\n",pkindex);
 }
-void Insert_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Insert_stmt::execute(Data *d)
 {
-	libxl::Sheet *sheet=book->getSheet(tbl_idx);
+	Database *db=static_cast<Database*>(d);
+	Table* tbl=db->tables[*tbl_name];
+	rowno=tbl->rowcnt;
+	int oldrowno=rowno;
+	pkcnt=tbl->pkcnt;
+	tbl_idx=tbl->idx;
+	libxl::Sheet *sheet=tbl->sheet;
 	for(int i=0;i<data->size();i++)
 	{
 		vector<Data_val*>* vec=data->at(i);
 		rowno++;
 		pkcnt++;
-		sheet->writeNum(rowno,pkindex,pkcnt);
+		if(auto_inc)
+		sheet->writeNum(rowno,auto_inc->idx,pkcnt);
 		for(int j=0;j<vec->size();j++)
 		{
 			switch(vec->at(j)->type)
 			{
-				case 1:sheet->writeNum(rowno,indexes[j],vec->at(j)->x.int_val);
+				case 1:sheet->writeNum(rowno,checker[j].idx,vec->at(j)->x.int_val);
+				if(checker[j].key)
+				{
+					checker[j].key->insert(to_string(vec->at(j)->x.int_val));
+				}
 				break;
-				case 2:sheet->writeNum(rowno,indexes[j],vec->at(j)->x.dbl_val);break;
-				case 3:sheet->writeStr(rowno,indexes[j],vec->at(j)->x.s->c_str());break;
-				case 4:sheet->writeStr(rowno,indexes[j],vec->at(j)->x.s->c_str());break;
+				case 2:sheet->writeNum(rowno,checker[j].idx,vec->at(j)->x.dbl_val);
+				if(checker[j].key)
+				{
+					checker[j].key->insert(to_string(vec->at(j)->x.dbl_val));
+				}
+				break;
+				case 3:
+				case 4:sheet->writeStr(rowno,checker[j].idx,vec->at(j)->x.s->c_str());
+				if(checker[j].key)
+				{
+					checker[j].key->insert(*(vec->at(j)->x.s));
+				}
+				break;
 			}
 		}
 	}
-	tbl.attribute("rowcnt").set_value(rowno);
-	tbl.attribute("pkcnt").set_value(pkcnt);
+	tbl->node.attribute("rowcnt").set_value(rowno);
+	tbl->node.attribute("pkcnt").set_value(pkcnt);
+	tbl->rowcnt=rowno;
+	tbl->pkcnt=pkcnt;
+	if(tbl->rows.size()==0)
+		tbl->rows.insert({1,rowno});
+	else
+		tbl->rows.rbegin()->second+=rowno-oldrowno;
+	tbl->rows_change=true;
 }
-void Delete_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Delete_stmt::check(Data *d)
 {
-	pugi::xml_node tbl_clmn=db_node.child(tbl_name->c_str()).child("columns");
-	if(tbl_clmn==NULL)
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	if(it==db->tables.end())
 	{
 		error=true;
 		error_msg="Table does not exist";
 		return;
 	}
-	if(where_cond&&where_cond->check(tbl_clmn))
+	if(where_cond&&where_cond->check(it->second))
 	{
 		error=true;
 		error_msg="Error in Where clause";
 		return;
 	}
-	if(orderby_cond&&orderby_cond->check(tbl_clmn))
+	if(orderby_cond&&orderby_cond->check(it->second))
 	{
 		error=true;
 		error_msg="Error in Orderby clause";
 		return;
 	}
 }
-void Delete_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Delete_stmt::execute(Data *d)
 {
-	libxl::Sheet* sheet=book->getSheet(1);
-	sheet->removeRow(3,3);
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	Table* tbl=it->second;
+	int rowcnt=tbl->rowcnt;
+	libxl::Sheet* sheet=tbl->sheet;
+	vector<int> res;
+	for(auto i=tbl->rows.begin();i!=tbl->rows.end();i++)
+	{
+		int idx=i->first,length=i->second;
+		for(int j=idx;j<idx+length;j++)
+			res.push_back(j);
+	}
+	if(where_cond)
+	{
+		where_cond->execute(tbl,limit);
+		if(orderby_cond)
+		{
+			orderby_cond->res=where_cond->res;
+			orderby_cond->execute(tbl);
+			res=orderby_cond->res;
+		}
+		else
+			res=where_cond->res;
+	}
+	else if(orderby_cond)
+	{
+		orderby_cond->res=res;
+		orderby_cond->execute(tbl);
+		res=orderby_cond->res;
+	}
+	map<int,int> vals;
+	compress(res,vals);
+	cerr<<res.size()<<" "<<vals.size()<<endl;
+	for(auto i=tbl->columns.begin();i!=tbl->columns.end();i++)
+	{
+		if(i->second->attr[1])
+			checker.push_back({i->second->datatype,i->second->idx,&tbl->primary});
+		else if(i->second->attr[0])
+			checker.push_back({i->second->datatype,i->second->idx,&tbl->keys[i->second->name]});
+	}
+	for(auto i=vals.begin();i!=vals.end();i++)
+	{
+		int in=i->first,len=i->second;
+		if(checker.size()>0)
+		{
+			for(int k=0;k<checker.size();k++)
+			{
+				for(int j=in;j<len+in;j++)
+				{
+					switch(checker[k].datatype)
+					{
+						case 1:checker[k].key->erase(to_string((int)sheet->readNum(j,checker[k].idx)));
+						break;
+						case 2:checker[k].key->erase(to_string(sheet->readNum(j,checker[k].idx)));
+						break;
+						case 3:
+						case 4:checker[j].key->erase(string(sheet->readStr(j,checker[k].idx)));
+						break;
+					}
+				}
+			}
+		}
+		tbl->sheet->clear(in,in+len-1,1,tbl->col_cnt);
+		auto x=tbl->rows.upper_bound(in);
+		x--;
+		int oldidx=x->first,oldlen=x->second;
+		tbl->rows.erase(x);
+		if(in==oldidx)
+		{
+			if(oldlen-len>0)
+			tbl->rows.insert({oldidx+len,oldlen-len});
+		}
+		else
+		{
+			if(in-oldidx>0)
+			tbl->rows.insert({oldidx,in-oldidx});
+			if(oldlen-in-len+1>0)
+			tbl->rows.insert({in+len,oldlen-in-len+1});
+		}
+	}
+	tbl->rows_change=true;
 }
-void Rename_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Delete_stmt::compress(vector<int> &res,map<int,int> &vals)
 {
+	sort(res.begin(),res.end());
+	int curr=res[0],init=res[0],length=1;
+	for(int i=1;i<res.size();i++)
+	{
+		if(res[i]==curr+1)
+		{
+			length++;
+			curr++;
+		}
+		else
+		{
+			vals.insert({init,length});
+			init=res[i];
+			curr=res[i];
+			length=1;
+		}
+	}
+	vals.insert({init,length});
+}
+void Rename_stmt::check(Data *d)
+{
+	Database *db=static_cast<Database*>(d);
 	for(int i=0;i<list->size();i++)
 	{
-		if(db_node.child(list->at(i)->first->c_str())==NULL)
+		if(db->tables.find(*(list->at(i)->first))==db->tables.end())
 		{
 			error=true;
 			error_msg="Table name does not exist";
@@ -865,74 +1158,84 @@ void Rename_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
 		}
 	}
 }
-void Rename_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Rename_stmt::execute(Data *d)
 {
+	Database *db=static_cast<Database*>(d);
 	for(int i=0;i<list->size();i++)
-		db_node.child(list->at(i)->first->c_str()).set_name(list->at(i)->second->c_str());
-}
-void Alter_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
-{
-	
-}
-void Alter_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
-{
-	
-}
-void Use_stmt::check(pugi::xml_node &db_node,libxl::Book* &book)
-{
-	if(db_name==NULL)
 	{
-		error=true;
-		error_msg="Database name not provided";
-		return;
+		db->node.child(list->at(i)->first->c_str()).set_name(list->at(i)->second->c_str());
+		auto val=db->tables.extract(*(list->at(i)->first));
+		val.key()=*(list->at(i)->second);
+		db->tables.insert(move(val));
+		Table* tbl=db->tables[*(list->at(i)->second)];
+		tbl->name=*(list->at(i)->second);
+		tbl->sheet->setName(list->at(i)->second->c_str());
 	}
-	n_db_node=db_node.child(db_name->c_str());
-	if(n_db_node==NULL)
+}
+void Alter_stmt::check(Data *d)
+{
+	
+}
+void Alter_stmt::execute(Data *d)
+{
+	
+}
+void Use_stmt::check(Data *d)
+{
+	Root *root=static_cast<Root*>(d);
+	auto it=root->databases.find(*db_name);
+	if(it==root->databases.end())
 	{
 		error=true;
 		error_msg="Database name does not exist";
 		return;
 	}
 }
-void Use_stmt::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Use_stmt::execute(Data *d)
 {
-	book->save(string(curdb.name()).append(".xls").c_str());
-	book->release();
-	book=xlCreateBook();
-	book->load(string(n_db_node.name()).append(".xls").c_str());
-	curdb=n_db_node;
+	Root *root=static_cast<Root*>(d);
+	curdb=root->databases[*db_name];
 }
-void Db_show::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Db_show::check(Data *d)
 {
 	
 }
-void Db_show::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Db_show::execute(Data *d)
 {
+	Root *root=static_cast<Root*>(d);
 	std::cout<<"\n";
-	for(pugi::xml_node node:db_node.children())
-		std::cout<<node.name()<<"\n";
+	for(auto it=root->databases.begin();it!=root->databases.end();it++)
+		std::cout<<it->first<<"\n";
 	std::cout<<"\n";
 }
-void Tbl_show::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Tbl_show::check(Data *d)
 {
-	if(db_name==NULL)
-		n_db_node=curdb;
-	else
-	n_db_node=db_node.child(db_name->c_str());
-	if(n_db_node==NULL)
+	Root *root=static_cast<Root*>(d);
+	if(db_name!=NULL)
 	{
-		error=true;
-		error_msg="Database does not exist";
+		if(root->databases.find(*db_name)==root->databases.end())
+		{
+			error=true;
+			error_msg="Database does not exist";
+			return;
+		}
 	}
+	
 }
-void Tbl_show::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Tbl_show::execute(Data *d)
 {
+	Root *root=static_cast<Root*>(d);
+	Database *db;
+	if(db_name==NULL)
+		db=curdb;
+	else
+		db=root->databases[*db_name];
 	std::cout<<"\n";
-	for(pugi::xml_node node:n_db_node.children())
-		std::cout<<node.name()<<"\n";
+	for(auto it=db->tables.begin();it!=db->tables.end();it++)
+		std::cout<<it->first<<"\n";
 	std::cout<<"\n";
 }
-void Clmns_show::check(pugi::xml_node &db_node,libxl::Book* &book)
+void Clmns_show::check(Data *d)
 {
 	if(tbl_name==NULL)
 	{
@@ -940,20 +1243,39 @@ void Clmns_show::check(pugi::xml_node &db_node,libxl::Book* &book)
 		error_msg="Table name not provided";
 		return;
 	}
-	if(db_name!=NULL)
-	tbl_node=db_node.child(db_name->c_str()).child(tbl_name->c_str()).child("columns");
+	Root *root=static_cast<Root*>(d);
+	Database *db;
+	if(db_name==NULL)
+		db=curdb;
 	else
-	tbl_node=curdb.child(tbl_name->c_str()).child("columns");
-	if(tbl_node==NULL)
+	{
+		auto it=root->databases.find(*db_name);
+		if(it==root->databases.end())
+		{
+			error=true;
+			error_msg="Database does not exist";
+			return;
+		}
+		db=it->second;
+	}
+	auto it=db->tables.find(*tbl_name);
+	if(it==db->tables.end())
 	{
 		error=true;
-		error_msg="Database or Table does not exist";
+		error_msg="Table does not exist";
 	}
 }
-void Clmns_show::execute(pugi::xml_node &db_node,libxl::Book* &book)
+void Clmns_show::execute(Data *d)
 {
+	Root *root=static_cast<Root*>(d);
+	Database *db;
+	if(db_name==NULL)
+		db=curdb;
+	else
+		db=root->databases[*db_name];
+	Table *tbl=db->tables[*tbl_name];
 	std::cout<<"\n";
-	for(pugi::xml_node node:tbl_node.children())
-		std::cout<<node.name()<<"\n";
+	for(auto it=tbl->columns.begin();it!=tbl->columns.end();it++)
+		std::cout<<it->first<<"\n";
 	std::cout<<"\n";
 }

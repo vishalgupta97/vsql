@@ -6,7 +6,7 @@ ifeq ($(ARCH), 32)
 else
   LIBPATH = $(LIB)/libxl/lib64
 endif
-CFLAGS = -I $(LIB)/pugixml -I $(LIB)/libxl/include_cpp $(LIB)/pugixml/pugixml.cpp -L $(LIBPATH) -I $(LIB)/LibBoolEE $(LIB)/LibBoolEE/LibBoolEE.cpp --std=c++14 -Wl,-rpath,$(LIBPATH)
+CFLAGS = -I $(LIB)/pugixml -I $(LIB)/libxl/include_cpp $(LIB)/pugixml/pugixml.cpp -L $(LIBPATH) -I $(LIB)/LibBoolEE $(LIB)/LibBoolEE/LibBoolEE.cpp --std=c++17 -Wl,-rpath,$(LIBPATH)
 
 all: sql
 
@@ -17,5 +17,5 @@ lexer: lex.yy.c
 	flex sql.l
 
 sql : lexer parser
-	-g++ $(CFLAGS) lex.yy.c sql.tab.c tree.cpp main.cpp -lxl -lfl 2> error.txt
+	-g++ $(CFLAGS) lex.yy.c sql.tab.c metadata.cpp tree.cpp main.cpp -lxl -lfl 2> error.txt
 	/mnt/c/Windows/System32/notepad.exe error.txt

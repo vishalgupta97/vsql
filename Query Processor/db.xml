@@ -1,21 +1,35 @@
 <?xml version="1.0"?>
 <databases>
 	<market count="2">
-		<item index="1" rowcnt="4" pkcnt="4">
-			<columns count="3">
-				<id datatype="1" index="1" unique="" primary="" auto_inc="" not_null="" />
+		<items index="1" rowcnt="7" count="3">
+			<columns>
+				<id datatype="1" index="1" unique="" primary="" not_null="" />
 				<name datatype="4" index="2" />
 				<price datatype="1" index="3" />
 			</columns>
-			<attributes />
-		</item>
-		<discount index="2" rowcnt="0" pkcnt="0">
-			<columns count="3">
-				<id datatype="1" index="1" unique="" primary="" auto_inc="" not_null="" />
-				<itemsid datatype="1" index="2" foreign="" to_tbl="items" to_clmn="id" />
+			<unique />
+			<foreign />
+			<primary>
+				<id />
+			</primary>
+			<rows>
+				<n i="6" l="2" />
+			</rows>
+		</items>
+		<discount index="2" rowcnt="0" count="3">
+			<columns>
+				<id datatype="1" index="1" unique="" primary="" not_null="" />
+				<itemsid datatype="1" index="2" foreign="" />
 				<value datatype="2" index="3" />
 			</columns>
-			<attributes />
+			<unique />
+			<foreign>
+				<itemsid to_tbl="items" to_clmn="id" />
+			</foreign>
+			<primary>
+				<id />
+			</primary>
+			<rows />
 		</discount>
 	</market>
 </databases>

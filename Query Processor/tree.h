@@ -4,15 +4,18 @@
 #include<iostream>
 #include<algorithm>
 #include<map>
+#include<unordered_set>
+#include<set>
 #include<stdlib.h>
 #include<cstring>
 #include "pugixml.hpp"
 #include "blfilter.h"
 #include "libxl.h"
 #include "LibBoolEE.h"
+#include "metadata.h"
 using namespace std;
-extern map<string,string> datatype_vals;
-extern pugi::xml_node curdb;
+extern map<string,int> datatype_vals;
+extern Database* curdb;
 extern bool yacc_err;
 class Data_val
 {
@@ -35,7 +38,7 @@ class Exp
 	public:int type;
 	bool error=false;
 	Exp(int type1):type(type1){}
-	virtual void check(pugi::xml_node &tbl_node)=0;
+	virtual void check(Table* tbl)=0;
 	virtual std::string gen(int &cnt,Where_stmt* stmt)=0;
 	virtual ~Exp(){}
 };
@@ -60,7 +63,7 @@ class Cond_exp:public Exp//1
 		if(rhs)
 			delete rhs;
 	}
-	void check(pugi::xml_node &tbl_node);
+	void check(Table* tbl);
 	std::string gen(int &cnt,Where_stmt* stmt);
 };
 class And_exp:public Exp//2
@@ -75,7 +78,7 @@ class And_exp:public Exp//2
 		if(rhs)
 			delete rhs;
 	}
-	void check(pugi::xml_node &tbl_node);
+	void check(Table* tbl);
 	std::string gen(int &cnt,Where_stmt* stmt);
 };
 class Or_exp:public Exp//3
@@ -90,7 +93,7 @@ class Or_exp:public Exp//3
 		if(rhs)
 			delete rhs;
 	}
-	void check(pugi::xml_node &tbl_node);
+	void check(Table* tbl);
 	std::string gen(int &cnt,Where_stmt* stmt);
 };
 class Where_stmt
@@ -104,8 +107,8 @@ class Where_stmt
 		if(exp)
 			delete exp;
 	}
-	bool check(pugi::xml_node tbl_clmns);
-	void execute(pugi::xml_node tbl_node,libxl::Sheet* &sheet);
+	bool check(Table* tbl);
+	void execute(Table* tbl,int limit);
 };
 class Orderby_stmt
 { public:
@@ -131,8 +134,8 @@ class Orderby_stmt
 			delete clmns_list;
 		}
 	}
-	bool check(pugi::xml_node tbl_clmn);
-	void execute(libxl::Sheet* &sheet);
+	bool check(Table* tbl);
+	void execute(Table* tbl);
 };
 class Special_ele
 { public:
@@ -252,8 +255,8 @@ class Sql_stmt
 	std::string error_msg;
 	Sql_stmt(int type1):type(type1),type_c(0){}
 	Sql_stmt(int type1,int type_c1):type(type1),type_c(type_c1){}
-	virtual void check(pugi::xml_node &db_node,libxl::Book* &book)=0;
-	virtual void execute(pugi::xml_node &db_node,libxl::Book* &book)=0;
+	virtual void check(Data *d)=0;
+	virtual void execute(Data *d)=0;
 	virtual ~Sql_stmt(){}
 };
 class Update_stmt:public Sql_stmt
@@ -271,18 +274,18 @@ class Update_stmt:public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Select_stmt:public Sql_stmt
 {
 	public:
 	vector<string*> *col_list;
 	string *tbl_name;
-	vector<pair<int,int> > index_type;//first-index,second-type
 	Where_stmt *where_cond;
 	Orderby_stmt *orderby_cond;
-	int limit;
+	int limit=0;
+	vector<pair<int,int> > index_type;//first-index,second-type
 	Select_stmt(vector<string*> *list,string *name,Where_stmt *cond,Orderby_stmt *cond1,int limit1):Sql_stmt(2),tbl_name(name),limit(limit1),where_cond(cond),orderby_cond(cond1),col_list(list){}
 	~Select_stmt(){
 		if(col_list)
@@ -299,28 +302,27 @@ class Select_stmt:public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Drop_stmt: public Sql_stmt
 { public:
 	Drop_stmt(int type1):Sql_stmt(3,type1){}
-	virtual void check(pugi::xml_node &db_node,libxl::Book* &book)=0;
-	virtual void execute(pugi::xml_node &db_node,libxl::Book* &book)=0;
+	virtual void check(Data *d)=0;
+	virtual void execute(Data *d)=0;
 	virtual ~Drop_stmt(){}
 };
 class Db_drop:public Drop_stmt
 {
 	public:
 	string *db_name;
-	pugi::xml_node n_db_node;
 	Db_drop(string *name):Drop_stmt(1),db_name(name){}
 	~Db_drop(){
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Tbl_drop:public Drop_stmt
 {
@@ -336,8 +338,8 @@ class Tbl_drop:public Drop_stmt
 			delete tbl_list;
 		}
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Idx_drop:public Drop_stmt
 {
@@ -350,8 +352,8 @@ class Idx_drop:public Drop_stmt
 		if(idx_name)
 			delete idx_name;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class View_drop:public Drop_stmt
 {
@@ -367,14 +369,14 @@ class View_drop:public Drop_stmt
 			delete view_list;
 		}
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Create_stmt: public Sql_stmt
 { public:
 	Create_stmt(int type1):Sql_stmt(4,type1){}
-	virtual void check(pugi::xml_node &db_node,libxl::Book* &book)=0;
-	virtual void execute(pugi::xml_node &db_node,libxl::Book* &book)=0;
+	virtual void check(Data *d)=0;
+	virtual void execute(Data *d)=0;
 	virtual ~Create_stmt(){}
 };
 class Db_create:public Create_stmt
@@ -386,8 +388,8 @@ class Db_create:public Create_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Tbl_create:public Create_stmt
 {
@@ -409,8 +411,8 @@ class Tbl_create:public Create_stmt
 		if(bfl)
 			delete bfl;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Idx_create:public Create_stmt
 {
@@ -431,8 +433,8 @@ class Idx_create:public Create_stmt
 			delete col_list;
 		}
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class View_create:public Create_stmt
 {
@@ -455,20 +457,27 @@ class View_create:public Create_stmt
 		if(stmt)
 			delete stmt;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
+
 class Insert_stmt:public Sql_stmt
 {
 	public:
+	struct check
+	{
+		int idx,datatype;
+		unordered_set<string> *key;
+		bool foreign;
+	};
 	string *tbl_name;
-	vector<int> checker;
-	vector<int> indexes;
-	int rowno=0,tbl_idx=0,pkcnt=0,pkindex=1;
+	Column* auto_inc;
+	vector<check> checker;
+	int rowno=0,tbl_idx=0,pkcnt=0,auto_index=1;
 	vector<string*> *cols;
 	vector<vector<Data_val*>* > *data;
 	pugi::xml_node tbl;
-	Insert_stmt(string *name,vector<string*> *cols1,vector<vector<Data_val*>* > *data1):Sql_stmt(5),tbl_name(name),data(data1),cols(cols1){}
+	Insert_stmt(string *name,vector<string*> *cols1,vector<vector<Data_val*>* > *data1):Sql_stmt(5),tbl_name(name),data(data1),cols(cols1),auto_inc(NULL){}
 	~Insert_stmt(){
 		if(tbl_name)
 			delete tbl_name;
@@ -493,8 +502,8 @@ class Insert_stmt:public Sql_stmt
 			delete data;
 		}
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Delete_stmt:public Sql_stmt
 {
@@ -502,7 +511,13 @@ class Delete_stmt:public Sql_stmt
 	string *tbl_name;
 	Where_stmt *where_cond;
 	Orderby_stmt *orderby_cond;
-	int limit;
+	int limit=0;
+	struct check
+	{
+		int datatype,idx;
+		unordered_set<string> *key;
+	};
+	vector<check> checker;
 	Delete_stmt(string *name,Where_stmt *stmt,Orderby_stmt *stmt1,int limit1):Sql_stmt(6),tbl_name(name),limit(limit1),where_cond(stmt),orderby_cond(stmt1){}
 	~Delete_stmt(){
 		if(tbl_name)
@@ -512,8 +527,9 @@ class Delete_stmt:public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
+	void compress(vector<int> &res,map<int,int> &vals);
 };
 class Rename_stmt:public Sql_stmt
 {
@@ -534,8 +550,8 @@ class Rename_stmt:public Sql_stmt
 			delete list;
 		}
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Alter_stmt:public Sql_stmt
 {
@@ -552,54 +568,51 @@ class Alter_stmt:public Sql_stmt
 				delete *i;
 		}
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Use_stmt:public Sql_stmt
 {
 	public:
 	string *db_name;
-	pugi::xml_node n_db_node;
 	Use_stmt(string *name):Sql_stmt(9),db_name(name){}
 	~Use_stmt(){
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Show_stmt: public Sql_stmt
 { public:
 	Show_stmt(int type1):Sql_stmt(10,type1){}
-	virtual void check(pugi::xml_node &db_node,libxl::Book* &book)=0;
-	virtual void execute(pugi::xml_node &db_node,libxl::Book* &book)=0;
+	virtual void check(Data *d)=0;
+	virtual void execute(Data *d)=0;
 	virtual ~Show_stmt(){}
 };
 class Db_show:public Show_stmt
 {
 	public:
 	Db_show():Show_stmt(1){}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Tbl_show:public Show_stmt
 {
 	public:
 	string *db_name;
-	pugi::xml_node n_db_node;
 	Tbl_show(string *name):Show_stmt(2),db_name(name){}
 	~Tbl_show(){
 		if(db_name)
 			delete db_name;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
 class Clmns_show:public Show_stmt
 {
 	public:
 	string *db_name,*tbl_name;
-	pugi::xml_node tbl_node;
 	Clmns_show(string *name,string *name1):Show_stmt(3),tbl_name(name),db_name(name1){}
 	~Clmns_show(){
 		if(db_name)
@@ -607,6 +620,6 @@ class Clmns_show:public Show_stmt
 		if(tbl_name)
 			delete tbl_name;
 	}
-	void check(pugi::xml_node &db_node,libxl::Book* &book);
-	void execute(pugi::xml_node &db_node,libxl::Book* &book);
+	void check(Data *d);
+	void execute(Data *d);
 };
