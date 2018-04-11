@@ -238,12 +238,24 @@ void Update_stmt::check(Data *d)
 	}
 	Table* tbl=it->second;
 	for(int i=0;i<list->size();i++)
-		if(tbl->columns.find(*(list->at(i)->first))==tbl->columns.end())
+	{
+		auto j=tbl->columns.find(*(list->at(i)->first));
+		if(j==tbl->columns.end())
 		{
 			error=true;
 			error_msg="Column name does not exist";
 			return;
 		}
+		if(j->second->datatype!=list->at(i)->second->type)
+		{
+			error=true;
+			error_msg="Type mismatch";
+			return;
+		}
+		if(j->second->attr[0])
+			unique_col_update=true;
+		index_type.push_back({j->second->idx,j->second->datatype});
+	}
 	if(where_cond&&where_cond->check(tbl))
 	{
 		error=true;
@@ -256,10 +268,61 @@ void Update_stmt::check(Data *d)
 		error_msg="Error in Orderby clause";
 		return;
 	}
+	for(auto i=tbl->rows.begin();i!=tbl->rows.end();i++)
+	{
+		int idx=i->first,length=i->second;
+		for(int j=idx;j<idx+length;j++)
+			res.push_back(j);
+	}
+	if(where_cond)
+	{
+		where_cond->execute(tbl,limit);
+		if(orderby_cond)
+		{
+			orderby_cond->res=where_cond->res;
+			orderby_cond->execute(tbl);
+			res=orderby_cond->res;
+		}
+		else
+			res=where_cond->res;
+	}
+	else if(orderby_cond)
+	{
+		orderby_cond->res=res;
+		orderby_cond->execute(tbl);
+		res=orderby_cond->res;
+	}
+	if(unique_col_update&&res.size()>1)
+	{
+		error=true;
+		error_msg="Same unique key after updation";
+		return;
+	}
 }
 void Update_stmt::execute(Data *d)
 {
-	
+	Database *db=static_cast<Database*>(d);
+	auto it=db->tables.find(*tbl_name);
+	Table* tbl=it->second; 
+	for(int i=0;i<res.size();i++)
+	{
+		for(int j=0;j<index_type.size();j++)
+		{
+			switch(index_type[j].second)
+			{
+				case 1:
+				tbl->sheet->writeNum(res[i],index_type[j].first,list->at(j)->second->x.int_val);
+				break;
+				case 2:
+				tbl->sheet->writeNum(res[i],index_type[j].first,list->at(j)->second->x.dbl_val);
+				break;
+				case 3:
+				case 4:
+				tbl->sheet->writeStr(res[i],index_type[j].first,list->at(j)->second->x.s->c_str());
+				break;
+			}
+		}
+	}
 }
 void Select_stmt::check(Data *d)
 {
@@ -1048,6 +1111,7 @@ void Delete_stmt::execute(Data *d)
 	int rowcnt=tbl->rowcnt;
 	libxl::Sheet* sheet=tbl->sheet;
 	vector<int> res;
+	bool unique_col_update;
 	for(auto i=tbl->rows.begin();i!=tbl->rows.end();i++)
 	{
 		int idx=i->first,length=i->second;

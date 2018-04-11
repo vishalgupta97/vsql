@@ -265,6 +265,9 @@ class Update_stmt:public Sql_stmt
 	string *tbl_name;
 	Orderby_stmt *orderby_cond;
 	Where_stmt *where_cond;
+	vector<pair<int,int> > index_type;//first-index,second-type
+	bool unique_col_update=false;
+	vector<int> res;
 	int limit;
 	vector<pair<string*,Data_val*>* > *list;
 	Update_stmt(string *name,vector<pair<string*,Data_val*>* > *list1,Where_stmt *cond1,Orderby_stmt *cond,int limit1):Sql_stmt(1),tbl_name(name),limit(limit1),list(list1),where_cond(cond1),orderby_cond(cond){	}
