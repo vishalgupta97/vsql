@@ -8,6 +8,7 @@
 #include<set>
 #include<stdlib.h>
 #include<cstring>
+#include<sstream>
 #include "pugixml.hpp"
 #include "blfilter.h"
 #include "libxl.h"
@@ -15,8 +16,7 @@
 #include "metadata.h"
 using namespace std;
 extern map<string,int> datatype_vals;
-extern Database* curdb;
-extern bool yacc_err;
+extern Root* root;
 class Data_val
 {
 	public:int type;
@@ -251,12 +251,13 @@ class Alter_spec
 class Sql_stmt
 { public:
 	int type,type_c;
+	stringstream output;
 	bool error=false;
 	std::string error_msg;
 	Sql_stmt(int type1):type(type1),type_c(0){}
 	Sql_stmt(int type1,int type_c1):type(type1),type_c(type_c1){}
-	virtual void check(Data *d)=0;
-	virtual void execute(Data *d)=0;
+	virtual void check(Database **d)=0;
+	virtual void execute(Database **d)=0;
 	virtual ~Sql_stmt(){}
 };
 class Update_stmt:public Sql_stmt
@@ -277,8 +278,8 @@ class Update_stmt:public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Select_stmt:public Sql_stmt
 {
@@ -305,14 +306,14 @@ class Select_stmt:public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Drop_stmt: public Sql_stmt
 { public:
 	Drop_stmt(int type1):Sql_stmt(3,type1){}
-	virtual void check(Data *d)=0;
-	virtual void execute(Data *d)=0;
+	virtual void check(Database **d)=0;
+	virtual void execute(Database **d)=0;
 	virtual ~Drop_stmt(){}
 };
 class Db_drop:public Drop_stmt
@@ -324,8 +325,8 @@ class Db_drop:public Drop_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Tbl_drop:public Drop_stmt
 {
@@ -341,8 +342,8 @@ class Tbl_drop:public Drop_stmt
 			delete tbl_list;
 		}
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Idx_drop:public Drop_stmt
 {
@@ -355,8 +356,8 @@ class Idx_drop:public Drop_stmt
 		if(idx_name)
 			delete idx_name;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class View_drop:public Drop_stmt
 {
@@ -372,14 +373,14 @@ class View_drop:public Drop_stmt
 			delete view_list;
 		}
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Create_stmt: public Sql_stmt
 { public:
 	Create_stmt(int type1):Sql_stmt(4,type1){}
-	virtual void check(Data *d)=0;
-	virtual void execute(Data *d)=0;
+	virtual void check(Database **d)=0;
+	virtual void execute(Database **d)=0;
 	virtual ~Create_stmt(){}
 };
 class Db_create:public Create_stmt
@@ -391,8 +392,8 @@ class Db_create:public Create_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Tbl_create:public Create_stmt
 {
@@ -414,8 +415,8 @@ class Tbl_create:public Create_stmt
 		if(bfl)
 			delete bfl;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Idx_create:public Create_stmt
 {
@@ -436,8 +437,8 @@ class Idx_create:public Create_stmt
 			delete col_list;
 		}
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class View_create:public Create_stmt
 {
@@ -460,8 +461,8 @@ class View_create:public Create_stmt
 		if(stmt)
 			delete stmt;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 
 class Insert_stmt:public Sql_stmt
@@ -505,8 +506,8 @@ class Insert_stmt:public Sql_stmt
 			delete data;
 		}
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Delete_stmt:public Sql_stmt
 {
@@ -530,8 +531,8 @@ class Delete_stmt:public Sql_stmt
 		if(orderby_cond)
 			delete orderby_cond;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 	void compress(vector<int> &res,map<int,int> &vals);
 };
 class Rename_stmt:public Sql_stmt
@@ -553,8 +554,8 @@ class Rename_stmt:public Sql_stmt
 			delete list;
 		}
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Alter_stmt:public Sql_stmt
 {
@@ -571,8 +572,8 @@ class Alter_stmt:public Sql_stmt
 				delete *i;
 		}
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Use_stmt:public Sql_stmt
 {
@@ -583,22 +584,22 @@ class Use_stmt:public Sql_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Show_stmt: public Sql_stmt
 { public:
 	Show_stmt(int type1):Sql_stmt(10,type1){}
-	virtual void check(Data *d)=0;
-	virtual void execute(Data *d)=0;
+	virtual void check(Database **d)=0;
+	virtual void execute(Database **d)=0;
 	virtual ~Show_stmt(){}
 };
 class Db_show:public Show_stmt
 {
 	public:
 	Db_show():Show_stmt(1){}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Tbl_show:public Show_stmt
 {
@@ -609,8 +610,8 @@ class Tbl_show:public Show_stmt
 		if(db_name)
 			delete db_name;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };
 class Clmns_show:public Show_stmt
 {
@@ -623,6 +624,6 @@ class Clmns_show:public Show_stmt
 		if(tbl_name)
 			delete tbl_name;
 	}
-	void check(Data *d);
-	void execute(Data *d);
+	void check(Database **d);
+	void execute(Database **d);
 };

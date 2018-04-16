@@ -1,15 +1,16 @@
+%{
+#include "sql.tab.h"
+#include "sql.h"
+%}
+%pure-parser
+%lex-param {void * scanner}
+%parse-param {void * scanner}
+%parse-param { Sql_stmt **stmt1}
 %code requires {
 #include<stdio.h>
 #include "tree.h"
-extern bool yacc_err;
-int yylex();
-int yyerror(const char *s);
+void yyerror(void *scanner,Sql_stmt **stmt1,const char *s);
 }
-%code {
-Sql_stmt *stmt1=0;
-}
-%define parse.error verbose
-%debug
 %union
 {
 	Cond_exp *cond_exp;
@@ -94,7 +95,7 @@ Sql_stmt *stmt1=0;
 %start sql
 
 %%
-sql : sql_stmt ';' {stmt1=$1;}
+sql : sql_stmt ';' {*stmt1=$1;}
 	| {stmt1=NULL;}
 ;
 sql_stmt : update_stmt {$$=$1;}
@@ -248,9 +249,8 @@ alter_spec : add_k add_col_def {$$=new Alter_spec();$$->type=1;($$->x).add_col=$
 			| change_k name col_def {$$=new Alter_spec();$$->type=3;($$->x).cng_col=new Change_col($2,$3);}
 ;
 %%
-int yyerror(const char *s)
+void yyerror(void *scanner,Sql_stmt **stmt1,const char *s)
 {
 printf("%s\n",s);
-yacc_err=true;
-return 1;
+*stmt1=NULL;
 }

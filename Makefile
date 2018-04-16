@@ -1,5 +1,7 @@
 CC=g++
-LIB=../Library
+LIB=Library
+CON=Connections
+QP=Query\ Processor
 ARCH = $(shell getconf LONG_BIT)
 ifeq ($(ARCH), 32)
   LIBPATH = $(LIB)/libxl/lib
@@ -10,12 +12,12 @@ CFLAGS = -I $(LIB)/pugixml -I $(LIB)/libxl/include_cpp $(LIB)/pugixml/pugixml.cp
 
 all: sql
 
-parser: sql.tab.c sql.tab.h
-	bison -d sql.y
+parser: $(QP)/sql.y
+	bison -d --output=$(QP)/sql.tab.c $(QP)/sql.y
 
-lexer: lex.yy.c 
-	flex sql.l
+lexer: $(QP)/sql.l
+	flex --header-file=$(QP)/sql.h --outfile=$(QP)/sql.c $(QP)/sql.l
 
 sql : lexer parser
-	-g++ $(CFLAGS) lex.yy.c sql.tab.c metadata.cpp tree.cpp main.cpp -lxl -lfl 2> error.txt
+	-g++ $(CFLAGS) $(QP)/sql.c $(QP)/sql.tab.c $(QP)/metadata.cpp $(QP)/tree.cpp $(QP)/execute.cpp $(CON)/main.cpp -lxl -lfl -pthread 2> error.txt
 	/mnt/c/Windows/System32/notepad.exe error.txt

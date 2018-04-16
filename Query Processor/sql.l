@@ -1,6 +1,8 @@
 %{
 #include "sql.tab.h"	
 %}
+%option reentrant
+%option bison-bridge
 name_exp [a-z][a-z0-9]*
 number [0-9]+
 %%
@@ -35,7 +37,7 @@ OR|or return or_k;
 BY|by return by_k;
 ASC|asc return asc_k;
 DESC|desc return dec_k;
-INT|int|DECIMAL|decimal|VARCHAR|varchar|TIMESTAMP|timestamp {yylval.s=new std::string(yytext,yyleng);return datatype_k;}
+INT|int|DECIMAL|decimal|VARCHAR|varchar|TIMESTAMP|timestamp {yylval->s=new std::string(yytext,yyleng);return datatype_k;}
 NOT|not return not_k;
 NULL|null return null_k;
 AUTO_INCREMENT|auto_increment return auto_k;
@@ -50,8 +52,8 @@ TO|to return to_k;
 IN|in return in_k;
 CHANGE|change return change_k;
 "="|","|";"|"*"|"("|")"|"\'"|"."|"<"|">"|"!" return yytext[0];
-{name_exp} {yylval.s=new std::string(yytext,yyleng); return name;}
-{number} {yylval.x=stoi(yytext); return number;}
+{name_exp} {yylval->s=new std::string(yytext,yyleng); return name;}
+{number} {yylval->x=stoi(yytext); return number;}
 "\n" return 0;
 [ \t] ;
 %%

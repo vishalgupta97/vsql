@@ -5,19 +5,19 @@ void Cond_exp::check(Table* tbl)
 	if(it==tbl->columns.end())
 	{
 		error=true;
-		printf("Column does not exist\n");
+		//printf("Column does not exist\n");
 		return;
 	}
 	if(it->second->datatype!=rhs->type)
 	{
 			error=true;
-			printf("Datatype mismatch\n");
+			//printf("Datatype mismatch\n");
 			return;
 	}
 	if((op_type!=1&&op_type!=6)&&(rhs->type==3||rhs->type==4))
 	{
 		error=true;
-		printf("that one\n");
+		//printf("that one\n");
 		return;
 	}
 	col_idx=it->second->idx;
@@ -219,16 +219,15 @@ void Orderby_stmt::execute(Table* tbl)
 					return !(this->clmns_list->at(k)->second);
 				else if(diff<0)
 					return this->clmns_list->at(k)->second;
-				printf("%d\n",diff);
 				break;
 			}
 		}
 		return false;
 	});
 }
-void Update_stmt::check(Data *d)
+void Update_stmt::check(Database **d)
 {
-	Database* db=static_cast<Database*>(d);
+	Database* db=static_cast<Database*>(*d);
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -299,9 +298,9 @@ void Update_stmt::check(Data *d)
 		return;
 	}
 }
-void Update_stmt::execute(Data *d)
+void Update_stmt::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	Table* tbl=it->second; 
 	for(int i=0;i<res.size();i++)
@@ -324,9 +323,9 @@ void Update_stmt::execute(Data *d)
 		}
 	}
 }
-void Select_stmt::check(Data *d)
+void Select_stmt::check(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -365,9 +364,9 @@ void Select_stmt::check(Data *d)
 		return;
 	}
 }
-void Select_stmt::execute(Data *d)
+void Select_stmt::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	Table* tbl=it->second;
 	int rowcnt=tbl->rowcnt;
@@ -414,19 +413,19 @@ void Select_stmt::execute(Data *d)
 		for(int j=0;j<index_type.size();j++)
 			switch(index_type[j].second)
 			{
-				case 1: printf("%d ",(int)sheet->readNum(res[i],index_type[j].first));break;
-				case 2: printf("%lf ",sheet->readNum(res[i],index_type[j].first));
+				case 1: output<<(int)sheet->readNum(res[i],index_type[j].first)<<" ";break;
+				case 2: output<<sheet->readNum(res[i],index_type[j].first)<<" ";
 				break;
 				case 3:
-				case 4: printf("%s ",sheet->readStr(res[i],index_type[j].first));
+				case 4: output<<sheet->readStr(res[i],index_type[j].first)<<" ";
 				break;
 			}
-		printf("\n");
+		output<<"\n";
 	}
 }
-void Db_drop::check(Data *d)
+void Db_drop::check(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
+	Database *curdb=static_cast<Database*>(*d);
 	auto it=root->databases.find(*db_name);
 	if(it==root->databases.end())
 	{
@@ -441,18 +440,18 @@ void Db_drop::check(Data *d)
 		return;
 	}
 }
-void Db_drop::execute(Data *d)
+void Db_drop::execute(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
+	Database *curdb=static_cast<Database*>(*d);
 	auto it=root->databases.find(*db_name);
 	string s=it->first;
 	remove(s.append(".xls").c_str());
 	root->node.remove_child(it->second->node);
 	root->databases.erase(it);
 }
-void Tbl_drop::check(Data *d)
+void Tbl_drop::check(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	for(int i=0;i<tbl_list->size();i++)
 		if(db->tables.find(*(tbl_list->at(i)))==db->tables.end())
 		{
@@ -461,9 +460,9 @@ void Tbl_drop::check(Data *d)
 			return;
 		}
 }
-void Tbl_drop::execute(Data *d)
+void Tbl_drop::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	for(int i=0;i<tbl_list->size();i++)
 	{
 		auto it=db->tables.find(*(tbl_list->at(i)));
@@ -474,25 +473,24 @@ void Tbl_drop::execute(Data *d)
 	}
 	db->node.attribute("count").set_value(db->cnt);
 }
-void Idx_drop::check(Data *d)
+void Idx_drop::check(Database **d)
 {
 	
 }
-void Idx_drop::execute(Data *d)
+void Idx_drop::execute(Database **d)
 {
 	
 }
-void View_drop::check(Data *d)
+void View_drop::check(Database **d)
 {
 	
 }
-void View_drop::execute(Data *d)
+void View_drop::execute(Database **d)
 {
 	
 }
-void Db_create::check(Data *d)
+void Db_create::check(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
 	auto it=root->databases.find(*db_name);
 	if(it!=root->databases.end())
 	{
@@ -500,9 +498,8 @@ void Db_create::check(Data *d)
 		error_msg="Database already exist";
 	}
 }
-void Db_create::execute(Data *d)
+void Db_create::execute(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
 	Database *db=new Database();
 	db->name=*db_name;
 	db->book=xlCreateBook();
@@ -513,7 +510,7 @@ void Db_create::execute(Data *d)
 	db->node.append_attribute("count").set_value(0);
 	root->databases.insert({*db_name,db});
 }
-void Tbl_create::check(Data *d)
+void Tbl_create::check(Database **d)
 {
 	if(!tbl_name)
 	{
@@ -527,7 +524,7 @@ void Tbl_create::check(Data *d)
 		error_msg="Table defination not provided";
 		return;
 	}
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	if(db->tables.find(*tbl_name)!=db->tables.end())
 	{
 		error=true;
@@ -675,22 +672,19 @@ void Tbl_create::check(Data *d)
 		}
 	}	
 }
-void Tbl_create::execute(Data *d)
+void Tbl_create::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	Table *tbl=new Table();
 	db->tables.insert({*tbl_name,tbl});
-	printf("here2\n");
 	tbl->name=*tbl_name;
 	tbl->node=db->node.append_child(tbl_name->c_str());
 	db->cnt++;
 	db->node.attribute("count").set_value(db->cnt);
-	printf("here3\n");
 	tbl->node.append_attribute("index").set_value(db->cnt);
 	tbl->idx=db->cnt;
 	tbl->node.append_attribute("rowcnt").set_value("0");
 	tbl->sheet=db->book->addSheet(tbl_name->c_str());
-	printf("here4\n");
 	pugi::xml_node clmns=tbl->node.append_child("columns");
 	pugi::xml_node unique_key=tbl->node.append_child("unique");
 	pugi::xml_node foreign_key=tbl->node.append_child("foreign");
@@ -835,9 +829,9 @@ void Tbl_create::execute(Data *d)
 	tbl->node.append_attribute("count").set_value(col_cnt);
 	tbl->col_cnt=col_cnt;
 }
-void Idx_create::check(Data *d)
+void Idx_create::check(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -866,9 +860,9 @@ void Idx_create::check(Data *d)
 		return;
 	}
 }
-void Idx_create::execute(Data *d)
+void Idx_create::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	Table *tbl=db->tables[*tbl_name];
 	if(col_list->size()>1)
 	{
@@ -882,17 +876,17 @@ void Idx_create::execute(Data *d)
 		tbl->keys[s];
 	}
 }
-void View_create::check(Data *d)
+void View_create::check(Database **d)
 {
 	
 }
-void View_create::execute(Data *d)
+void View_create::execute(Database **d)
 {
 	
 }
-void Insert_stmt::check(Data *d)
+void Insert_stmt::check(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -1028,9 +1022,9 @@ void Insert_stmt::check(Data *d)
 		}
 	}
 }
-void Insert_stmt::execute(Data *d)
+void Insert_stmt::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	Table* tbl=db->tables[*tbl_name];
 	rowno=tbl->rowcnt;
 	int oldrowno=rowno;
@@ -1080,9 +1074,9 @@ void Insert_stmt::execute(Data *d)
 		tbl->rows.rbegin()->second+=rowno-oldrowno;
 	tbl->rows_change=true;
 }
-void Delete_stmt::check(Data *d)
+void Delete_stmt::check(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -1103,9 +1097,9 @@ void Delete_stmt::check(Data *d)
 		return;
 	}
 }
-void Delete_stmt::execute(Data *d)
+void Delete_stmt::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
 	Table* tbl=it->second;
 	int rowcnt=tbl->rowcnt;
@@ -1209,9 +1203,9 @@ void Delete_stmt::compress(vector<int> &res,map<int,int> &vals)
 	}
 	vals.insert({init,length});
 }
-void Rename_stmt::check(Data *d)
+void Rename_stmt::check(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	for(int i=0;i<list->size();i++)
 	{
 		if(db->tables.find(*(list->at(i)->first))==db->tables.end())
@@ -1222,9 +1216,9 @@ void Rename_stmt::check(Data *d)
 		}
 	}
 }
-void Rename_stmt::execute(Data *d)
+void Rename_stmt::execute(Database **d)
 {
-	Database *db=static_cast<Database*>(d);
+	Database *db=*d;
 	for(int i=0;i<list->size();i++)
 	{
 		db->node.child(list->at(i)->first->c_str()).set_name(list->at(i)->second->c_str());
@@ -1236,17 +1230,16 @@ void Rename_stmt::execute(Data *d)
 		tbl->sheet->setName(list->at(i)->second->c_str());
 	}
 }
-void Alter_stmt::check(Data *d)
+void Alter_stmt::check(Database **d)
 {
 	
 }
-void Alter_stmt::execute(Data *d)
+void Alter_stmt::execute(Database **d)
 {
 	
 }
-void Use_stmt::check(Data *d)
+void Use_stmt::check(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
 	auto it=root->databases.find(*db_name);
 	if(it==root->databases.end())
 	{
@@ -1255,26 +1248,23 @@ void Use_stmt::check(Data *d)
 		return;
 	}
 }
-void Use_stmt::execute(Data *d)
+void Use_stmt::execute(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
-	curdb=root->databases[*db_name];
+	*d=root->databases[*db_name];
 }
-void Db_show::check(Data *d)
+void Db_show::check(Database **d)
 {
 	
 }
-void Db_show::execute(Data *d)
+void Db_show::execute(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
-	std::cout<<"\n";
+	output<<"\n";
 	for(auto it=root->databases.begin();it!=root->databases.end();it++)
-		std::cout<<it->first<<"\n";
-	std::cout<<"\n";
+		output<<it->first<<"\n";
+	output<<"\n";
 }
-void Tbl_show::check(Data *d)
+void Tbl_show::check(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
 	if(db_name!=NULL)
 	{
 		if(root->databases.find(*db_name)==root->databases.end())
@@ -1284,22 +1274,26 @@ void Tbl_show::check(Data *d)
 			return;
 		}
 	}
-	
+	else if(d==NULL)
+	{
+		error=true;
+		error_msg="No Current Database";
+	}
 }
-void Tbl_show::execute(Data *d)
+void Tbl_show::execute(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
+	Database* curdb=*d;
 	Database *db;
 	if(db_name==NULL)
 		db=curdb;
 	else
 		db=root->databases[*db_name];
-	std::cout<<"\n";
+	output<<"\n";
 	for(auto it=db->tables.begin();it!=db->tables.end();it++)
-		std::cout<<it->first<<"\n";
-	std::cout<<"\n";
+		output<<it->first<<"\n";
+	output<<"\n";
 }
-void Clmns_show::check(Data *d)
+void Clmns_show::check(Database **d)
 {
 	if(tbl_name==NULL)
 	{
@@ -1307,10 +1301,17 @@ void Clmns_show::check(Data *d)
 		error_msg="Table name not provided";
 		return;
 	}
-	Root *root=static_cast<Root*>(d);
 	Database *db;
 	if(db_name==NULL)
-		db=curdb;
+	{
+		if(d==NULL)
+		{
+			error=true;
+			error_msg="No Current Database";
+			return;
+		}
+		db=*d;
+	}
 	else
 	{
 		auto it=root->databases.find(*db_name);
@@ -1329,17 +1330,17 @@ void Clmns_show::check(Data *d)
 		error_msg="Table does not exist";
 	}
 }
-void Clmns_show::execute(Data *d)
+void Clmns_show::execute(Database **d)
 {
-	Root *root=static_cast<Root*>(d);
+	Database* curdb=*d;
 	Database *db;
 	if(db_name==NULL)
 		db=curdb;
 	else
 		db=root->databases[*db_name];
 	Table *tbl=db->tables[*tbl_name];
-	std::cout<<"\n";
+	output<<"\n";
 	for(auto it=tbl->columns.begin();it!=tbl->columns.end();it++)
-		std::cout<<it->first<<"\n";
-	std::cout<<"\n";
+		output<<it->first<<"\n";
+	output<<"\n";
 }
