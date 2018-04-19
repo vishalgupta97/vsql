@@ -2,6 +2,7 @@
 #include<iostream>
 #include<time.h>
 #include<sstream>
+#include<thread>
 #include "libxl.h"
 #include "sql.tab.h"
 #include "sql.h"
@@ -62,13 +63,10 @@ void run(int connfd)
 					output<<"Error "<<stmt1->error_msg<<"\n";
 			}
 		}
-		if(stmt1&&!stmt1->error)
-		{
-			if(curdb)
-				curdb->save();
-			root->save();
-		}
 		if(stmt1)
 		delete stmt1;
 	}
+	if(curdb)
+		curdb->save();
+	root->save();
 }

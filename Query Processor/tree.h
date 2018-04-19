@@ -9,6 +9,8 @@
 #include<stdlib.h>
 #include<cstring>
 #include<sstream>
+#include<thread>
+#include<shared_mutex>
 #include "pugixml.hpp"
 #include "blfilter.h"
 #include "libxl.h"
@@ -100,6 +102,7 @@ class Where_stmt
 { public:
 	Exp *exp;
 	vector<Cond_exp*> exps;
+	vector<int> input;//input index
 	vector<int> res;//output index;
 	Where_stmt(Exp *exp1):exp(exp1){}
 	~Where_stmt()

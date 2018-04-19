@@ -6,6 +6,7 @@
 #include<utility>
 #include<string.h>
 #include<iostream>
+#include<shared_mutex>
 #include "pugixml.hpp"
 #include "libxl.h"
 #include "LibBoolEE.h"
@@ -29,6 +30,7 @@ class Root:public Data
 	unordered_map<string,Database*> databases;
 	pugi::xml_node node;
 	pugi::xml_document doc;
+	shared_mutex mutex;
 	Root();
 	void save();
 };
@@ -40,6 +42,7 @@ class Database:public Data
 	pugi::xml_node node;
 	int cnt=0;
 	unordered_map<string,Table*> tables;
+	shared_mutex mutex;
 	Database()
 	{
 		type=1;
@@ -53,6 +56,7 @@ class Table:public Data
 	string name;
 	libxl::Sheet* sheet;
 	pugi::xml_node node;
+	shared_mutex mutex;
 	int idx=0,rowcnt=0,pkcnt=0,col_cnt=0;
 	unordered_map<string,Column*> columns;
 	map<int,int> rows;//Rows having data

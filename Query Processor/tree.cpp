@@ -110,8 +110,9 @@ void Where_stmt::execute(Table* tbl,int limit)
 	for(int i=0;i<cnt;i++)
 		vals.insert({"t"+to_string(i),false});
 	bool temp=false;
-	for(int i=1;i<=rowno;i++)
+	for(int k=0;k<input.size();k++)
 	{
+		int i=input[k];
 		for(int j=0;j<cnt;j++)
 		{
 			switch(exps[j]->op_type)
@@ -123,7 +124,7 @@ void Where_stmt::execute(Table* tbl,int limit)
 					case 2:temp=tbl->sheet->readNum(i,exps[j]->col_idx)==exps[j]->rhs->x.dbl_val;
 					break;
 					case 3:
-					case 4:temp=exps[j]->rhs->x.s->compare(tbl->sheet->readStr(i,exps[j]->col_idx))==0;
+					case 4:temp=strcmp(exps[j]->rhs->x.s->c_str(),tbl->sheet->readStr(i,exps[j]->col_idx))==0;
 					break;
 				}
 				break;
@@ -228,6 +229,7 @@ void Orderby_stmt::execute(Table* tbl)
 void Update_stmt::check(Database **d)
 {
 	Database* db=static_cast<Database*>(*d);
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -236,6 +238,7 @@ void Update_stmt::check(Database **d)
 		return;
 	}
 	Table* tbl=it->second;
+	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	for(int i=0;i<list->size();i++)
 	{
 		auto j=tbl->columns.find(*(list->at(i)->first));
@@ -275,6 +278,7 @@ void Update_stmt::check(Database **d)
 	}
 	if(where_cond)
 	{
+		where_cond->input=res;
 		where_cond->execute(tbl,limit);
 		if(orderby_cond)
 		{
@@ -301,8 +305,10 @@ void Update_stmt::check(Database **d)
 void Update_stmt::execute(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	Table* tbl=it->second; 
+	unique_lock<shared_mutex> tblWLock(tbl->mutex);
 	for(int i=0;i<res.size();i++)
 	{
 		for(int j=0;j<index_type.size();j++)
@@ -326,6 +332,7 @@ void Update_stmt::execute(Database **d)
 void Select_stmt::check(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -334,6 +341,7 @@ void Select_stmt::check(Database **d)
 		return;
 	}
 	Table* tbl=it->second;
+	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	if(col_list)
 	{
 		for(int i=0;i<col_list->size();i++)
@@ -367,8 +375,10 @@ void Select_stmt::check(Database **d)
 void Select_stmt::execute(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	Table* tbl=it->second;
+	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	int rowcnt=tbl->rowcnt;
 	libxl::Sheet* sheet=tbl->sheet;
 	vector<int> res;
@@ -380,6 +390,7 @@ void Select_stmt::execute(Database **d)
 	}
 	if(where_cond)
 	{
+		where_cond->input=res;
 		where_cond->execute(tbl,limit);
 		if(orderby_cond)
 		{
@@ -426,6 +437,7 @@ void Select_stmt::execute(Database **d)
 void Db_drop::check(Database **d)
 {
 	Database *curdb=static_cast<Database*>(*d);
+	shared_lock<shared_mutex> rootRLock(root->mutex);
 	auto it=root->databases.find(*db_name);
 	if(it==root->databases.end())
 	{
@@ -442,7 +454,7 @@ void Db_drop::check(Database **d)
 }
 void Db_drop::execute(Database **d)
 {
-	Database *curdb=static_cast<Database*>(*d);
+	unique_lock<shared_mutex> rootWLock(root->mutex);
 	auto it=root->databases.find(*db_name);
 	string s=it->first;
 	remove(s.append(".xls").c_str());
@@ -452,6 +464,7 @@ void Db_drop::execute(Database **d)
 void Tbl_drop::check(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	for(int i=0;i<tbl_list->size();i++)
 		if(db->tables.find(*(tbl_list->at(i)))==db->tables.end())
 		{
@@ -463,9 +476,11 @@ void Tbl_drop::check(Database **d)
 void Tbl_drop::execute(Database **d)
 {
 	Database *db=*d;
+	unique_lock<shared_mutex> dbWLock(db->mutex);
 	for(int i=0;i<tbl_list->size();i++)
 	{
 		auto it=db->tables.find(*(tbl_list->at(i)));
+		unique_lock<shared_mutex> tblWLock(it->second->mutex);
 		db->book->delSheet(it->second->idx);
 		db->node.remove_child(it->second->node);
 		db->tables.erase(it);
@@ -491,6 +506,7 @@ void View_drop::execute(Database **d)
 }
 void Db_create::check(Database **d)
 {
+	shared_lock<shared_mutex> rootRLock(root->mutex);
 	auto it=root->databases.find(*db_name);
 	if(it!=root->databases.end())
 	{
@@ -500,6 +516,7 @@ void Db_create::check(Database **d)
 }
 void Db_create::execute(Database **d)
 {
+	unique_lock<shared_mutex> rootWLock(root->mutex);
 	Database *db=new Database();
 	db->name=*db_name;
 	db->book=xlCreateBook();
@@ -525,6 +542,7 @@ void Tbl_create::check(Database **d)
 		return;
 	}
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	if(db->tables.find(*tbl_name)!=db->tables.end())
 	{
 		error=true;
@@ -675,6 +693,7 @@ void Tbl_create::check(Database **d)
 void Tbl_create::execute(Database **d)
 {
 	Database *db=*d;
+	unique_lock<shared_mutex> dbWLock(db->mutex);
 	Table *tbl=new Table();
 	db->tables.insert({*tbl_name,tbl});
 	tbl->name=*tbl_name;
@@ -833,6 +852,7 @@ void Idx_create::check(Database **d)
 {
 	Database *db=*d;
 	auto it=db->tables.find(*tbl_name);
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	if(it==db->tables.end())
 	{
 		error=true;
@@ -840,6 +860,7 @@ void Idx_create::check(Database **d)
 		return;
 	}
 	Table *tbl=it->second;
+	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	s="";
 	for(int i=0;i<col_list->size();i++)
 	{
@@ -863,7 +884,9 @@ void Idx_create::check(Database **d)
 void Idx_create::execute(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	Table *tbl=db->tables[*tbl_name];
+	unique_lock<shared_mutex> tblWLock(tbl->mutex);
 	if(col_list->size()>1)
 	{
 		pugi::xml_node node=tbl->node.child("attributes").append_child(s.c_str());
@@ -887,6 +910,7 @@ void View_create::execute(Database **d)
 void Insert_stmt::check(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -895,6 +919,7 @@ void Insert_stmt::check(Database **d)
 		return;
 	}
 	Table* tbl=it->second;
+	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	if(cols==NULL)
 	{
 		pugi::xml_node clmn=tbl->node.child("columns");
@@ -1025,7 +1050,10 @@ void Insert_stmt::check(Database **d)
 void Insert_stmt::execute(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	Table* tbl=db->tables[*tbl_name];
+	unique_lock<shared_mutex> tblWLock(tbl->mutex);
+	this_thread::sleep_for(10s);
 	rowno=tbl->rowcnt;
 	int oldrowno=rowno;
 	pkcnt=tbl->pkcnt;
@@ -1077,6 +1105,7 @@ void Insert_stmt::execute(Database **d)
 void Delete_stmt::check(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	if(it==db->tables.end())
 	{
@@ -1084,6 +1113,7 @@ void Delete_stmt::check(Database **d)
 		error_msg="Table does not exist";
 		return;
 	}
+	shared_lock<shared_mutex> tblRLock(it->second->mutex);
 	if(where_cond&&where_cond->check(it->second))
 	{
 		error=true;
@@ -1100,8 +1130,10 @@ void Delete_stmt::check(Database **d)
 void Delete_stmt::execute(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	auto it=db->tables.find(*tbl_name);
 	Table* tbl=it->second;
+	unique_lock<shared_mutex> tblWLock(tbl->mutex);
 	int rowcnt=tbl->rowcnt;
 	libxl::Sheet* sheet=tbl->sheet;
 	vector<int> res;
@@ -1206,6 +1238,7 @@ void Delete_stmt::compress(vector<int> &res,map<int,int> &vals)
 void Rename_stmt::check(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	for(int i=0;i<list->size();i++)
 	{
 		if(db->tables.find(*(list->at(i)->first))==db->tables.end())
@@ -1219,6 +1252,7 @@ void Rename_stmt::check(Database **d)
 void Rename_stmt::execute(Database **d)
 {
 	Database *db=*d;
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	for(int i=0;i<list->size();i++)
 	{
 		db->node.child(list->at(i)->first->c_str()).set_name(list->at(i)->second->c_str());
@@ -1240,6 +1274,7 @@ void Alter_stmt::execute(Database **d)
 }
 void Use_stmt::check(Database **d)
 {
+	shared_lock<shared_mutex> rootRLock(root->mutex);
 	auto it=root->databases.find(*db_name);
 	if(it==root->databases.end())
 	{
@@ -1250,6 +1285,7 @@ void Use_stmt::check(Database **d)
 }
 void Use_stmt::execute(Database **d)
 {
+	shared_lock<shared_mutex> rootRLock(root->mutex);
 	*d=root->databases[*db_name];
 }
 void Db_show::check(Database **d)
@@ -1258,6 +1294,7 @@ void Db_show::check(Database **d)
 }
 void Db_show::execute(Database **d)
 {
+	shared_lock<shared_mutex> rootRLock(root->mutex);
 	output<<"\n";
 	for(auto it=root->databases.begin();it!=root->databases.end();it++)
 		output<<it->first<<"\n";
@@ -1267,6 +1304,7 @@ void Tbl_show::check(Database **d)
 {
 	if(db_name!=NULL)
 	{
+		shared_lock<shared_mutex> rootRLock(root->mutex);
 		if(root->databases.find(*db_name)==root->databases.end())
 		{
 			error=true;
@@ -1288,6 +1326,7 @@ void Tbl_show::execute(Database **d)
 		db=curdb;
 	else
 		db=root->databases[*db_name];
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	output<<"\n";
 	for(auto it=db->tables.begin();it!=db->tables.end();it++)
 		output<<it->first<<"\n";
@@ -1338,7 +1377,9 @@ void Clmns_show::execute(Database **d)
 		db=curdb;
 	else
 		db=root->databases[*db_name];
+	shared_lock<shared_mutex> dbRLock(db->mutex);
 	Table *tbl=db->tables[*tbl_name];
+	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	output<<"\n";
 	for(auto it=tbl->columns.begin();it!=tbl->columns.end();it++)
 		output<<it->first<<"\n";

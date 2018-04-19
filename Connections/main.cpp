@@ -11,6 +11,7 @@
 #include "../Query Processor/tree.h"
 #include "ThreadPool.h"
 map<string,int> datatype_vals;
+ThreadPool *pool;
 Root* root;
 void initdatatype()
 {
@@ -23,7 +24,7 @@ int main()
 {
 	initdatatype();
 	root=new Root();
-	ThreadPool *pool=new ThreadPool(5);
+	pool=new ThreadPool(5);
 	int listenfd,connfd;
 	struct sockaddr_in sin;
 	socklen_t addrsize;
