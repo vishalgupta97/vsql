@@ -1,0 +1,2544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:bison="http://www.gnu.org/software/bison/">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>sql.y - GNU Bison XML Automaton Report</title>
+    <style type="text/css">
+      body {
+        font-family: "Nimbus Sans L", Arial, sans-serif;
+        font-size: 9pt;
+      }
+      a:link {
+        color: #1f00ff;
+        text-decoration: none;
+      }
+      a:visited {
+        color: #1f00ff;
+        text-decoration: none;
+      }
+      a:hover {
+        color: red;
+      }
+      #menu a {
+        text-decoration: underline;
+      }
+      .i {
+        font-style: italic;
+      }
+      .pre {
+        font-family: monospace;
+        white-space: pre;
+      }
+      ol.decimal {
+        list-style-type: decimal;
+      }
+      ol.lower-alpha {
+        list-style-type: lower-alpha;
+      }
+      .point {
+        color: #cc0000;
+      }
+      #footer {
+        margin-top: 3.5em;
+        font-size: 7pt;
+      }
+      </style>
+  </head>
+  <body><h1>GNU Bison XML Automaton Report</h1><p>
+    input grammar: <span class="i">sql.y</span></p>
+
+<h3>Table of Contents</h3><ul id="menu"><li><a href="#reductions">Reductions</a><ul class="lower-alpha"><li><a href="#nonterminals_useless_in_grammar">Nonterminals useless in grammar</a></li><li><a href="#terminals_unused_in_grammar">Terminals unused in grammar</a></li><li><a href="#rules_useless_in_grammar">Rules useless in grammar</a></li></ul></li><li><a href="#conflicts">Conflicts</a></li><li><a href="#grammar">Grammar</a><ul class="lower-alpha"><li><a href="#grammar">Itemset</a></li><li><a href="#terminals">Terminal symbols</a></li><li><a href="#nonterminals">Nonterminal symbols</a></li></ul></li><li><a href="#automaton">Automaton</a></li></ul><h2><a name="reductions" id="reductions"></a> Reductions</h2><h3><a name="nonterminals_useless_in_grammar" id="nonterminals_useless_in_grammar"></a> Nonterminals useless in grammar</h3>
+
+<h3><a name="terminals_unused_in_grammar" id="terminals_unused_in_grammar"></a> Terminals unused in grammar</h3>
+
+<h3><a name="rules_useless_in_grammar" id="rules_useless_in_grammar"></a> Rules useless in grammar</h3>
+<h2><a name="conflicts" id="conflicts"></a> Conflicts</h2>
+
+<h2><a name="grammar" id="grammar"></a> Grammar</h2>
+<p class="pre">
+<a name="rule_0" id="rule_0"></a>    0 <span class="i">$accept</span> → <span class="i">sql</span> <b>$end</b>
+
+<a name="rule_1" id="rule_1"></a>    1 <span class="i">sql</span> → <span class="i">sql_stmt</span> <b>';'</b>
+<a name="rule_2" id="rule_2"></a>    2     | %empty
+
+<a name="rule_3" id="rule_3"></a>    3 <span class="i">sql_stmt</span> → <span class="i">update_stmt</span>
+<a name="rule_4" id="rule_4"></a>    4          | <span class="i">select_stmt</span>
+<a name="rule_5" id="rule_5"></a>    5          | <span class="i">drop_stmt</span>
+<a name="rule_6" id="rule_6"></a>    6          | <span class="i">create_stmt</span>
+<a name="rule_7" id="rule_7"></a>    7          | <span class="i">insert_stmt</span>
+<a name="rule_8" id="rule_8"></a>    8          | <span class="i">delete_stmt</span>
+<a name="rule_9" id="rule_9"></a>    9          | <span class="i">rename_stmt</span>
+<a name="rule_10" id="rule_10"></a>   10          | <span class="i">alter_stmt</span>
+<a name="rule_11" id="rule_11"></a>   11          | <span class="i">use_stmt</span>
+<a name="rule_12" id="rule_12"></a>   12          | <span class="i">show_stmt</span>
+
+<a name="rule_13" id="rule_13"></a>   13 <span class="i">drop_stmt</span> → <b>drop_k</b> <span class="i">type_drop</span>
+
+<a name="rule_14" id="rule_14"></a>   14 <span class="i">type_drop</span> → <b>database_k</b> <b>name</b>
+<a name="rule_15" id="rule_15"></a>   15           | <b>table_k</b> <span class="i">name_list</span>
+<a name="rule_16" id="rule_16"></a>   16           | <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b>
+<a name="rule_17" id="rule_17"></a>   17           | <b>view_k</b> <span class="i">name_list</span>
+
+<a name="rule_18" id="rule_18"></a>   18 <span class="i">create_stmt</span> → <b>create_k</b> <span class="i">type_create</span>
+
+<a name="rule_19" id="rule_19"></a>   19 <span class="i">type_create</span> → <b>database_k</b> <b>name</b>
+<a name="rule_20" id="rule_20"></a>   20             | <b>table_k</b> <b>name</b> <b>'('</b> <span class="i">create_def_list</span> <b>')'</b>
+<a name="rule_21" id="rule_21"></a>   21             | <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+<a name="rule_22" id="rule_22"></a>   22             | <b>view_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>as_k</b> <span class="i">select_stmt</span>
+
+<a name="rule_23" id="rule_23"></a>   23 <span class="i">create_def_list</span> → <span class="i">create_def</span>
+<a name="rule_24" id="rule_24"></a>   24                 | <span class="i">create_def_list</span> <b>','</b> <span class="i">create_def</span>
+
+<a name="rule_25" id="rule_25"></a>   25 <span class="i">create_def</span> → <span class="i">col_def</span>
+<a name="rule_26" id="rule_26"></a>   26            | <span class="i">constraints</span>
+
+<a name="rule_27" id="rule_27"></a>   27 <span class="i">constraints</span> → <b>primary_k</b> <b>key_k</b> <span class="i">col_list_chk</span>
+<a name="rule_28" id="rule_28"></a>   28             | <b>index_k</b> <span class="i">col_list_chk</span>
+<a name="rule_29" id="rule_29"></a>   29             | <b>unique_k</b> <span class="i">col_list_chk</span>
+<a name="rule_30" id="rule_30"></a>   30             | <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+
+<a name="rule_31" id="rule_31"></a>   31 <span class="i">col_def</span> → <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+
+<a name="rule_32" id="rule_32"></a>   32 <span class="i">data_type</span> → <b>datatype_k</b>
+<a name="rule_33" id="rule_33"></a>   33           | <b>datatype_k</b> <b>'('</b> <b>number</b> <b>')'</b>
+
+<a name="rule_34" id="rule_34"></a>   34 <span class="i">special_list1</span> → <span class="i">special_list</span>
+<a name="rule_35" id="rule_35"></a>   35               | %empty
+
+<a name="rule_36" id="rule_36"></a>   36 <span class="i">special_list</span> → <span class="i">special_ele</span>
+<a name="rule_37" id="rule_37"></a>   37              | <span class="i">special_list</span> <span class="i">special_ele</span>
+
+<a name="rule_38" id="rule_38"></a>   38 <span class="i">special_ele</span> → <b>not_k</b> <b>null_k</b>
+<a name="rule_39" id="rule_39"></a>   39             | <b>auto_k</b>
+<a name="rule_40" id="rule_40"></a>   40             | <b>primary_k</b> <b>key_k</b>
+<a name="rule_41" id="rule_41"></a>   41             | <b>unique_k</b>
+<a name="rule_42" id="rule_42"></a>   42             | <b>references_k</b> <b>name</b> <b>name</b>
+
+<a name="rule_43" id="rule_43"></a>   43 <span class="i">rename_stmt</span> → <b>rename_k</b> <b>table_k</b> <span class="i">rename_list</span>
+
+<a name="rule_44" id="rule_44"></a>   44 <span class="i">rename_list</span> → <b>name</b> <b>to_k</b> <b>name</b>
+<a name="rule_45" id="rule_45"></a>   45             | <span class="i">rename_list</span> <b>','</b> <b>name</b> <b>to_k</b> <b>name</b>
+
+<a name="rule_46" id="rule_46"></a>   46 <span class="i">use_stmt</span> → <b>use_k</b> <b>name</b>
+
+<a name="rule_47" id="rule_47"></a>   47 <span class="i">show_stmt</span> → <b>show_k</b> <span class="i">type_show</span>
+
+<a name="rule_48" id="rule_48"></a>   48 <span class="i">type_show</span> → <b>databases_k</b>
+<a name="rule_49" id="rule_49"></a>   49           | <b>tables_k</b> <span class="i">opt_name</span>
+<a name="rule_50" id="rule_50"></a>   50           | <b>columns_k</b> <b>in_k</b> <b>name</b> <span class="i">opt_name</span>
+
+<a name="rule_51" id="rule_51"></a>   51 <span class="i">opt_name</span> → <b>in_k</b> <b>name</b>
+<a name="rule_52" id="rule_52"></a>   52          | %empty
+
+<a name="rule_53" id="rule_53"></a>   53 <span class="i">insert_stmt</span> → <b>insert_k</b> <b>into_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>values_k</b> <span class="i">val_set</span>
+
+<a name="rule_54" id="rule_54"></a>   54 <span class="i">col_list_chk</span> → <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+<a name="rule_55" id="rule_55"></a>   55              | %empty
+
+<a name="rule_56" id="rule_56"></a>   56 <span class="i">name_list</span> → <b>name</b>
+<a name="rule_57" id="rule_57"></a>   57           | <span class="i">name_list</span> <b>','</b> <b>name</b>
+
+<a name="rule_58" id="rule_58"></a>   58 <span class="i">val_set</span> → <span class="i">val_list1</span>
+<a name="rule_59" id="rule_59"></a>   59         | <span class="i">val_set</span> <b>','</b> <span class="i">val_list1</span>
+
+<a name="rule_60" id="rule_60"></a>   60 <span class="i">val_list1</span> → <b>'('</b> <span class="i">val_list</span> <b>')'</b>
+
+<a name="rule_61" id="rule_61"></a>   61 <span class="i">val_list</span> → <span class="i">data</span>
+<a name="rule_62" id="rule_62"></a>   62          | <span class="i">val_list</span> <b>','</b> <span class="i">data</span>
+
+<a name="rule_63" id="rule_63"></a>   63 <span class="i">data</span> → <b>'\''</b> <b>name</b> <b>'\''</b>
+<a name="rule_64" id="rule_64"></a>   64      | <b>name</b>
+<a name="rule_65" id="rule_65"></a>   65      | <b>number</b>
+<a name="rule_66" id="rule_66"></a>   66      | <b>number</b> <b>'.'</b> <b>number</b>
+
+<a name="rule_67" id="rule_67"></a>   67 <span class="i">delete_stmt</span> → <b>delete_k</b> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+<a name="rule_68" id="rule_68"></a>   68 <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+<a name="rule_69" id="rule_69"></a>   69 <span class="i">select_col_chk</span> → <b>'*'</b>
+<a name="rule_70" id="rule_70"></a>   70                | <span class="i">name_list</span>
+
+<a name="rule_71" id="rule_71"></a>   71 <span class="i">where_stmt</span> → <b>where_k</b> <span class="i">where_cond</span>
+<a name="rule_72" id="rule_72"></a>   72            | %empty
+
+<a name="rule_73" id="rule_73"></a>   73 <span class="i">where_cond</span> → <span class="i">exp</span>
+
+<a name="rule_74" id="rule_74"></a>   74 <span class="i">exp</span> → <span class="i">exp</span> <b>and_k</b> <span class="i">exp</span>
+<a name="rule_75" id="rule_75"></a>   75     | <span class="i">exp</span> <b>or_k</b> <span class="i">exp</span>
+<a name="rule_76" id="rule_76"></a>   76     | <b>'('</b> <span class="i">exp</span> <b>')'</b>
+<a name="rule_77" id="rule_77"></a>   77     | <span class="i">cond_exp</span>
+
+<a name="rule_78" id="rule_78"></a>   78 <span class="i">cond_exp</span> → <b>name</b> <b>'='</b> <span class="i">data</span>
+<a name="rule_79" id="rule_79"></a>   79          | <b>name</b> <b>'&lt;'</b> <span class="i">data</span>
+<a name="rule_80" id="rule_80"></a>   80          | <b>name</b> <b>'&gt;'</b> <span class="i">data</span>
+<a name="rule_81" id="rule_81"></a>   81          | <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span>
+<a name="rule_82" id="rule_82"></a>   82          | <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span>
+<a name="rule_83" id="rule_83"></a>   83          | <b>name</b> <b>'!'</b> <b>'='</b> <span class="i">data</span>
+
+<a name="rule_84" id="rule_84"></a>   84 <span class="i">orderby_stmt</span> → <b>order_k</b> <b>by_k</b> <span class="i">orderby_list</span>
+<a name="rule_85" id="rule_85"></a>   85              | %empty
+
+<a name="rule_86" id="rule_86"></a>   86 <span class="i">orderby_list</span> → <b>name</b> <span class="i">order_type</span>
+<a name="rule_87" id="rule_87"></a>   87              | <span class="i">orderby_list</span> <b>','</b> <b>name</b> <span class="i">order_type</span>
+
+<a name="rule_88" id="rule_88"></a>   88 <span class="i">order_type</span> → <b>asc_k</b>
+<a name="rule_89" id="rule_89"></a>   89            | <b>dec_k</b>
+
+<a name="rule_90" id="rule_90"></a>   90 <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+<a name="rule_91" id="rule_91"></a>   91 <span class="i">set_list</span> → <span class="i">set_single</span>
+<a name="rule_92" id="rule_92"></a>   92          | <span class="i">set_list</span> <b>','</b> <span class="i">set_single</span>
+
+<a name="rule_93" id="rule_93"></a>   93 <span class="i">set_single</span> → <b>name</b> <b>'='</b> <span class="i">data</span>
+
+<a name="rule_94" id="rule_94"></a>   94 <span class="i">limit_stmt</span> → <b>limit_k</b> <b>number</b>
+<a name="rule_95" id="rule_95"></a>   95            | %empty
+
+<a name="rule_96" id="rule_96"></a>   96 <span class="i">alter_stmt</span> → <b>alter_k</b> <b>table_k</b> <b>name</b> <span class="i">alter_spec_list</span>
+
+<a name="rule_97" id="rule_97"></a>   97 <span class="i">alter_spec_list</span> → <span class="i">alter_spec</span>
+<a name="rule_98" id="rule_98"></a>   98                 | <span class="i">alter_spec_list</span> <b>','</b> <span class="i">alter_spec</span>
+
+<a name="rule_99" id="rule_99"></a>   99 <span class="i">add_col_def</span> → <span class="i">col_def</span>
+<a name="rule_100" id="rule_100"></a>  100             | <b>'('</b> <span class="i">col_def_list</span> <b>')'</b>
+
+<a name="rule_101" id="rule_101"></a>  101 <span class="i">col_def_list</span> → <span class="i">col_def</span>
+<a name="rule_102" id="rule_102"></a>  102              | <span class="i">col_def_list</span> <b>','</b> <span class="i">col_def</span>
+
+<a name="rule_103" id="rule_103"></a>  103 <span class="i">alter_spec</span> → <b>add_k</b> <span class="i">add_col_def</span>
+<a name="rule_104" id="rule_104"></a>  104            | <b>add_k</b> <b>constraint_k</b> <span class="i">constraints</span>
+<a name="rule_105" id="rule_105"></a>  105            | <b>change_k</b> <b>name</b> <span class="i">col_def</span>
+</p>
+
+<h3><a name="terminals" id="terminals"></a> Terminals, with rules where they appear</h3>
+
+<p class="pre"><b>$end</b> (0) <a href="#rule_0">0</a>
+<b>'!'</b> (33) <a href="#rule_83">83</a>
+<b>'\''</b> (39) <a href="#rule_63">63</a>
+<b>'('</b> (40) <a href="#rule_20">20</a> <a href="#rule_21">21</a> <a href="#rule_33">33</a> <a href="#rule_54">54</a> <a href="#rule_60">60</a> <a href="#rule_76">76</a> <a href="#rule_100">100</a>
+<b>')'</b> (41) <a href="#rule_20">20</a> <a href="#rule_21">21</a> <a href="#rule_33">33</a> <a href="#rule_54">54</a> <a href="#rule_60">60</a> <a href="#rule_76">76</a> <a href="#rule_100">100</a>
+<b>'*'</b> (42) <a href="#rule_69">69</a>
+<b>','</b> (44) <a href="#rule_24">24</a> <a href="#rule_45">45</a> <a href="#rule_57">57</a> <a href="#rule_59">59</a> <a href="#rule_62">62</a> <a href="#rule_87">87</a> <a href="#rule_92">92</a> <a href="#rule_98">98</a> <a href="#rule_102">102</a>
+<b>'.'</b> (46) <a href="#rule_66">66</a>
+<b>';'</b> (59) <a href="#rule_1">1</a>
+<b>'&lt;'</b> (60) <a href="#rule_79">79</a> <a href="#rule_81">81</a>
+<b>'='</b> (61) <a href="#rule_78">78</a> <a href="#rule_81">81</a> <a href="#rule_82">82</a> <a href="#rule_83">83</a> <a href="#rule_93">93</a>
+<b>'&gt;'</b> (62) <a href="#rule_80">80</a> <a href="#rule_82">82</a>
+<b>error</b> (256)
+<b>insert_k</b> (258) <a href="#rule_53">53</a>
+<b>into_k</b> (259) <a href="#rule_53">53</a>
+<b>values_k</b> (260) <a href="#rule_53">53</a>
+<b>update_k</b> (261) <a href="#rule_90">90</a>
+<b>set_k</b> (262) <a href="#rule_90">90</a>
+<b>select_k</b> (263) <a href="#rule_68">68</a>
+<b>from_k</b> (264) <a href="#rule_67">67</a> <a href="#rule_68">68</a>
+<b>where_k</b> (265) <a href="#rule_71">71</a>
+<b>order_k</b> (266) <a href="#rule_84">84</a>
+<b>by_k</b> (267) <a href="#rule_84">84</a>
+<b>and_k</b> (268) <a href="#rule_74">74</a>
+<b>or_k</b> (269) <a href="#rule_75">75</a>
+<b>asc_k</b> (270) <a href="#rule_88">88</a>
+<b>dec_k</b> (271) <a href="#rule_89">89</a>
+<b>delete_k</b> (272) <a href="#rule_67">67</a>
+<b>not_k</b> (273) <a href="#rule_38">38</a>
+<b>null_k</b> (274) <a href="#rule_38">38</a>
+<b>primary_k</b> (275) <a href="#rule_27">27</a> <a href="#rule_40">40</a>
+<b>key_k</b> (276) <a href="#rule_27">27</a> <a href="#rule_30">30</a> <a href="#rule_40">40</a>
+<b>auto_k</b> (277) <a href="#rule_39">39</a>
+<b>drop_k</b> (278) <a href="#rule_13">13</a>
+<b>database_k</b> (279) <a href="#rule_14">14</a> <a href="#rule_19">19</a>
+<b>table_k</b> (280) <a href="#rule_15">15</a> <a href="#rule_20">20</a> <a href="#rule_43">43</a> <a href="#rule_96">96</a>
+<b>create_k</b> (281) <a href="#rule_18">18</a>
+<b>rename_k</b> (282) <a href="#rule_43">43</a>
+<b>alter_k</b> (283) <a href="#rule_96">96</a>
+<b>add_k</b> (284) <a href="#rule_103">103</a> <a href="#rule_104">104</a>
+<b>constraint_k</b> (285) <a href="#rule_104">104</a>
+<b>limit_k</b> (286) <a href="#rule_94">94</a>
+<b>use_k</b> (287) <a href="#rule_46">46</a>
+<b>show_k</b> (288) <a href="#rule_47">47</a>
+<b>databases_k</b> (289) <a href="#rule_48">48</a>
+<b>tables_k</b> (290) <a href="#rule_49">49</a>
+<b>columns_k</b> (291) <a href="#rule_50">50</a>
+<b>index_k</b> (292) <a href="#rule_16">16</a> <a href="#rule_21">21</a> <a href="#rule_28">28</a>
+<b>view_k</b> (293) <a href="#rule_17">17</a> <a href="#rule_22">22</a>
+<b>unique_k</b> (294) <a href="#rule_29">29</a> <a href="#rule_41">41</a>
+<b>foreign_k</b> (295) <a href="#rule_30">30</a>
+<b>references_k</b> (296) <a href="#rule_30">30</a> <a href="#rule_42">42</a>
+<b>on_k</b> (297) <a href="#rule_16">16</a> <a href="#rule_21">21</a>
+<b>as_k</b> (298) <a href="#rule_22">22</a>
+<b>to_k</b> (299) <a href="#rule_44">44</a> <a href="#rule_45">45</a>
+<b>change_k</b> (300) <a href="#rule_105">105</a>
+<b>in_k</b> (301) <a href="#rule_50">50</a> <a href="#rule_51">51</a>
+<b>name</b> (302) <a href="#rule_14">14</a> <a href="#rule_16">16</a> <a href="#rule_19">19</a> <a href="#rule_20">20</a> <a href="#rule_21">21</a> <a href="#rule_22">22</a> <a href="#rule_30">30</a> <a href="#rule_31">31</a> <a href="#rule_42">42</a> <a href="#rule_44">44</a> <a href="#rule_45">45</a> <a href="#rule_46">46</a> <a href="#rule_50">50</a> <a href="#rule_51">51</a> <a href="#rule_53">53</a> <a href="#rule_56">56</a> <a href="#rule_57">57</a> <a href="#rule_63">63</a> <a href="#rule_64">64</a> <a href="#rule_67">67</a> <a href="#rule_68">68</a> <a href="#rule_78">78</a> <a href="#rule_79">79</a> <a href="#rule_80">80</a> <a href="#rule_81">81</a> <a href="#rule_82">82</a> <a href="#rule_83">83</a> <a href="#rule_86">86</a> <a href="#rule_87">87</a> <a href="#rule_90">90</a> <a href="#rule_93">93</a> <a href="#rule_96">96</a> <a href="#rule_105">105</a>
+<b>datatype_k</b> (303) <a href="#rule_32">32</a> <a href="#rule_33">33</a>
+<b>number</b> (304) <a href="#rule_33">33</a> <a href="#rule_65">65</a> <a href="#rule_66">66</a> <a href="#rule_94">94</a>
+</p>
+
+<h3><a name="nonterminals" id="nonterminals"></a> Nonterminals, with rules where they appear</h3>
+
+<p class="pre"><b>$accept</b> (61)
+    on left: <a href="#rule_0">0</a>
+<b>sql</b> (62)
+    on left: <a href="#rule_1">1</a> <a href="#rule_2">2</a>
+    on right: <a href="#rule_0">0</a>
+<b>sql_stmt</b> (63)
+    on left: <a href="#rule_3">3</a> <a href="#rule_4">4</a> <a href="#rule_5">5</a> <a href="#rule_6">6</a> <a href="#rule_7">7</a> <a href="#rule_8">8</a> <a href="#rule_9">9</a> <a href="#rule_10">10</a> <a href="#rule_11">11</a> <a href="#rule_12">12</a>
+    on right: <a href="#rule_1">1</a>
+<b>drop_stmt</b> (64)
+    on left: <a href="#rule_13">13</a>
+    on right: <a href="#rule_5">5</a>
+<b>type_drop</b> (65)
+    on left: <a href="#rule_14">14</a> <a href="#rule_15">15</a> <a href="#rule_16">16</a> <a href="#rule_17">17</a>
+    on right: <a href="#rule_13">13</a>
+<b>create_stmt</b> (66)
+    on left: <a href="#rule_18">18</a>
+    on right: <a href="#rule_6">6</a>
+<b>type_create</b> (67)
+    on left: <a href="#rule_19">19</a> <a href="#rule_20">20</a> <a href="#rule_21">21</a> <a href="#rule_22">22</a>
+    on right: <a href="#rule_18">18</a>
+<b>create_def_list</b> (68)
+    on left: <a href="#rule_23">23</a> <a href="#rule_24">24</a>
+    on right: <a href="#rule_20">20</a> <a href="#rule_24">24</a>
+<b>create_def</b> (69)
+    on left: <a href="#rule_25">25</a> <a href="#rule_26">26</a>
+    on right: <a href="#rule_23">23</a> <a href="#rule_24">24</a>
+<b>constraints</b> (70)
+    on left: <a href="#rule_27">27</a> <a href="#rule_28">28</a> <a href="#rule_29">29</a> <a href="#rule_30">30</a>
+    on right: <a href="#rule_26">26</a> <a href="#rule_104">104</a>
+<b>col_def</b> (71)
+    on left: <a href="#rule_31">31</a>
+    on right: <a href="#rule_25">25</a> <a href="#rule_99">99</a> <a href="#rule_101">101</a> <a href="#rule_102">102</a> <a href="#rule_105">105</a>
+<b>data_type</b> (72)
+    on left: <a href="#rule_32">32</a> <a href="#rule_33">33</a>
+    on right: <a href="#rule_31">31</a>
+<b>special_list1</b> (73)
+    on left: <a href="#rule_34">34</a> <a href="#rule_35">35</a>
+    on right: <a href="#rule_31">31</a>
+<b>special_list</b> (74)
+    on left: <a href="#rule_36">36</a> <a href="#rule_37">37</a>
+    on right: <a href="#rule_34">34</a> <a href="#rule_37">37</a>
+<b>special_ele</b> (75)
+    on left: <a href="#rule_38">38</a> <a href="#rule_39">39</a> <a href="#rule_40">40</a> <a href="#rule_41">41</a> <a href="#rule_42">42</a>
+    on right: <a href="#rule_36">36</a> <a href="#rule_37">37</a>
+<b>rename_stmt</b> (76)
+    on left: <a href="#rule_43">43</a>
+    on right: <a href="#rule_9">9</a>
+<b>rename_list</b> (77)
+    on left: <a href="#rule_44">44</a> <a href="#rule_45">45</a>
+    on right: <a href="#rule_43">43</a> <a href="#rule_45">45</a>
+<b>use_stmt</b> (78)
+    on left: <a href="#rule_46">46</a>
+    on right: <a href="#rule_11">11</a>
+<b>show_stmt</b> (79)
+    on left: <a href="#rule_47">47</a>
+    on right: <a href="#rule_12">12</a>
+<b>type_show</b> (80)
+    on left: <a href="#rule_48">48</a> <a href="#rule_49">49</a> <a href="#rule_50">50</a>
+    on right: <a href="#rule_47">47</a>
+<b>opt_name</b> (81)
+    on left: <a href="#rule_51">51</a> <a href="#rule_52">52</a>
+    on right: <a href="#rule_49">49</a> <a href="#rule_50">50</a>
+<b>insert_stmt</b> (82)
+    on left: <a href="#rule_53">53</a>
+    on right: <a href="#rule_7">7</a>
+<b>col_list_chk</b> (83)
+    on left: <a href="#rule_54">54</a> <a href="#rule_55">55</a>
+    on right: <a href="#rule_22">22</a> <a href="#rule_27">27</a> <a href="#rule_28">28</a> <a href="#rule_29">29</a> <a href="#rule_30">30</a> <a href="#rule_53">53</a>
+<b>name_list</b> (84)
+    on left: <a href="#rule_56">56</a> <a href="#rule_57">57</a>
+    on right: <a href="#rule_15">15</a> <a href="#rule_17">17</a> <a href="#rule_21">21</a> <a href="#rule_54">54</a> <a href="#rule_57">57</a> <a href="#rule_70">70</a>
+<b>val_set</b> (85)
+    on left: <a href="#rule_58">58</a> <a href="#rule_59">59</a>
+    on right: <a href="#rule_53">53</a> <a href="#rule_59">59</a>
+<b>val_list1</b> (86)
+    on left: <a href="#rule_60">60</a>
+    on right: <a href="#rule_58">58</a> <a href="#rule_59">59</a>
+<b>val_list</b> (87)
+    on left: <a href="#rule_61">61</a> <a href="#rule_62">62</a>
+    on right: <a href="#rule_60">60</a> <a href="#rule_62">62</a>
+<b>data</b> (88)
+    on left: <a href="#rule_63">63</a> <a href="#rule_64">64</a> <a href="#rule_65">65</a> <a href="#rule_66">66</a>
+    on right: <a href="#rule_61">61</a> <a href="#rule_62">62</a> <a href="#rule_78">78</a> <a href="#rule_79">79</a> <a href="#rule_80">80</a> <a href="#rule_81">81</a> <a href="#rule_82">82</a> <a href="#rule_83">83</a> <a href="#rule_93">93</a>
+<b>delete_stmt</b> (89)
+    on left: <a href="#rule_67">67</a>
+    on right: <a href="#rule_8">8</a>
+<b>select_stmt</b> (90)
+    on left: <a href="#rule_68">68</a>
+    on right: <a href="#rule_4">4</a> <a href="#rule_22">22</a>
+<b>select_col_chk</b> (91)
+    on left: <a href="#rule_69">69</a> <a href="#rule_70">70</a>
+    on right: <a href="#rule_68">68</a>
+<b>where_stmt</b> (92)
+    on left: <a href="#rule_71">71</a> <a href="#rule_72">72</a>
+    on right: <a href="#rule_67">67</a> <a href="#rule_68">68</a> <a href="#rule_90">90</a>
+<b>where_cond</b> (93)
+    on left: <a href="#rule_73">73</a>
+    on right: <a href="#rule_71">71</a>
+<b>exp</b> (94)
+    on left: <a href="#rule_74">74</a> <a href="#rule_75">75</a> <a href="#rule_76">76</a> <a href="#rule_77">77</a>
+    on right: <a href="#rule_73">73</a> <a href="#rule_74">74</a> <a href="#rule_75">75</a> <a href="#rule_76">76</a>
+<b>cond_exp</b> (95)
+    on left: <a href="#rule_78">78</a> <a href="#rule_79">79</a> <a href="#rule_80">80</a> <a href="#rule_81">81</a> <a href="#rule_82">82</a> <a href="#rule_83">83</a>
+    on right: <a href="#rule_77">77</a>
+<b>orderby_stmt</b> (96)
+    on left: <a href="#rule_84">84</a> <a href="#rule_85">85</a>
+    on right: <a href="#rule_67">67</a> <a href="#rule_68">68</a> <a href="#rule_90">90</a>
+<b>orderby_list</b> (97)
+    on left: <a href="#rule_86">86</a> <a href="#rule_87">87</a>
+    on right: <a href="#rule_84">84</a> <a href="#rule_87">87</a>
+<b>order_type</b> (98)
+    on left: <a href="#rule_88">88</a> <a href="#rule_89">89</a>
+    on right: <a href="#rule_86">86</a> <a href="#rule_87">87</a>
+<b>update_stmt</b> (99)
+    on left: <a href="#rule_90">90</a>
+    on right: <a href="#rule_3">3</a>
+<b>set_list</b> (100)
+    on left: <a href="#rule_91">91</a> <a href="#rule_92">92</a>
+    on right: <a href="#rule_90">90</a> <a href="#rule_92">92</a>
+<b>set_single</b> (101)
+    on left: <a href="#rule_93">93</a>
+    on right: <a href="#rule_91">91</a> <a href="#rule_92">92</a>
+<b>limit_stmt</b> (102)
+    on left: <a href="#rule_94">94</a> <a href="#rule_95">95</a>
+    on right: <a href="#rule_67">67</a> <a href="#rule_68">68</a> <a href="#rule_90">90</a>
+<b>alter_stmt</b> (103)
+    on left: <a href="#rule_96">96</a>
+    on right: <a href="#rule_10">10</a>
+<b>alter_spec_list</b> (104)
+    on left: <a href="#rule_97">97</a> <a href="#rule_98">98</a>
+    on right: <a href="#rule_96">96</a> <a href="#rule_98">98</a>
+<b>add_col_def</b> (105)
+    on left: <a href="#rule_99">99</a> <a href="#rule_100">100</a>
+    on right: <a href="#rule_103">103</a>
+<b>col_def_list</b> (106)
+    on left: <a href="#rule_101">101</a> <a href="#rule_102">102</a>
+    on right: <a href="#rule_100">100</a> <a href="#rule_102">102</a>
+<b>alter_spec</b> (107)
+    on left: <a href="#rule_103">103</a> <a href="#rule_104">104</a> <a href="#rule_105">105</a>
+    on right: <a href="#rule_97">97</a> <a href="#rule_98">98</a>
+</p><h2><a name="automaton" id="automaton"></a> Automaton</h2>
+
+<h3><a name="state_0" id="state_0"></a>state 0</h3>
+
+<p class="pre">  <a href="#rule_0">  0</a> <span class="i">$accept</span> → <span class="point">.</span> <span class="i">sql</span> <b>$end</b>
+  <a href="#rule_1">  1</a> <span class="i">sql</span> → <span class="point">.</span> <span class="i">sql_stmt</span> <b>';'</b>
+  <a href="#rule_2">  2</a>     | <span class="point">.</span> %empty  [$end]
+  <a href="#rule_3">  3</a> <span class="i">sql_stmt</span> → <span class="point">.</span> <span class="i">update_stmt</span>
+  <a href="#rule_4">  4</a>          | <span class="point">.</span> <span class="i">select_stmt</span>
+  <a href="#rule_5">  5</a>          | <span class="point">.</span> <span class="i">drop_stmt</span>
+  <a href="#rule_6">  6</a>          | <span class="point">.</span> <span class="i">create_stmt</span>
+  <a href="#rule_7">  7</a>          | <span class="point">.</span> <span class="i">insert_stmt</span>
+  <a href="#rule_8">  8</a>          | <span class="point">.</span> <span class="i">delete_stmt</span>
+  <a href="#rule_9">  9</a>          | <span class="point">.</span> <span class="i">rename_stmt</span>
+  <a href="#rule_10"> 10</a>          | <span class="point">.</span> <span class="i">alter_stmt</span>
+  <a href="#rule_11"> 11</a>          | <span class="point">.</span> <span class="i">use_stmt</span>
+  <a href="#rule_12"> 12</a>          | <span class="point">.</span> <span class="i">show_stmt</span>
+  <a href="#rule_13"> 13</a> <span class="i">drop_stmt</span> → <span class="point">.</span> <b>drop_k</b> <span class="i">type_drop</span>
+  <a href="#rule_18"> 18</a> <span class="i">create_stmt</span> → <span class="point">.</span> <b>create_k</b> <span class="i">type_create</span>
+  <a href="#rule_43"> 43</a> <span class="i">rename_stmt</span> → <span class="point">.</span> <b>rename_k</b> <b>table_k</b> <span class="i">rename_list</span>
+  <a href="#rule_46"> 46</a> <span class="i">use_stmt</span> → <span class="point">.</span> <b>use_k</b> <b>name</b>
+  <a href="#rule_47"> 47</a> <span class="i">show_stmt</span> → <span class="point">.</span> <b>show_k</b> <span class="i">type_show</span>
+  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <span class="point">.</span> <b>insert_k</b> <b>into_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>values_k</b> <span class="i">val_set</span>
+  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <span class="point">.</span> <b>delete_k</b> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <span class="point">.</span> <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <span class="point">.</span> <b>update_k</b> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_96"> 96</a> <span class="i">alter_stmt</span> → <span class="point">.</span> <b>alter_k</b> <b>table_k</b> <b>name</b> <span class="i">alter_spec_list</span>
+
+    insert_k  <a href="#state_1">shift, and go to state 1</a>
+    update_k  <a href="#state_2">shift, and go to state 2</a>
+    select_k  <a href="#state_3">shift, and go to state 3</a>
+    delete_k  <a href="#state_4">shift, and go to state 4</a>
+    drop_k    <a href="#state_5">shift, and go to state 5</a>
+    create_k  <a href="#state_6">shift, and go to state 6</a>
+    rename_k  <a href="#state_7">shift, and go to state 7</a>
+    alter_k   <a href="#state_8">shift, and go to state 8</a>
+    use_k     <a href="#state_9">shift, and go to state 9</a>
+    show_k    <a href="#state_10">shift, and go to state 10</a>
+
+    $default  <a href="#rule_2">reduce using rule 2</a> (sql)
+
+    sql          <a href="#state_11">go to state 11</a>
+    sql_stmt     <a href="#state_12">go to state 12</a>
+    drop_stmt    <a href="#state_13">go to state 13</a>
+    create_stmt  <a href="#state_14">go to state 14</a>
+    rename_stmt  <a href="#state_15">go to state 15</a>
+    use_stmt     <a href="#state_16">go to state 16</a>
+    show_stmt    <a href="#state_17">go to state 17</a>
+    insert_stmt  <a href="#state_18">go to state 18</a>
+    delete_stmt  <a href="#state_19">go to state 19</a>
+    select_stmt  <a href="#state_20">go to state 20</a>
+    update_stmt  <a href="#state_21">go to state 21</a>
+    alter_stmt   <a href="#state_22">go to state 22</a>
+</p>
+
+<h3><a name="state_1" id="state_1"></a>state 1</h3>
+
+<p class="pre">  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <b>insert_k</b> <span class="point">.</span> <b>into_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>values_k</b> <span class="i">val_set</span>
+
+    into_k  <a href="#state_23">shift, and go to state 23</a>
+</p>
+
+<h3><a name="state_2" id="state_2"></a>state 2</h3>
+
+<p class="pre">  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <span class="point">.</span> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    name  <a href="#state_24">shift, and go to state 24</a>
+</p>
+
+<h3><a name="state_3" id="state_3"></a>state 3</h3>
+
+<p class="pre">  <a href="#rule_56"> 56</a> <span class="i">name_list</span> → <span class="point">.</span> <b>name</b>
+  <a href="#rule_57"> 57</a>           | <span class="point">.</span> <span class="i">name_list</span> <b>','</b> <b>name</b>
+  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="point">.</span> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_69"> 69</a> <span class="i">select_col_chk</span> → <span class="point">.</span> <b>'*'</b>
+  <a href="#rule_70"> 70</a>                | <span class="point">.</span> <span class="i">name_list</span>
+
+    name  <a href="#state_25">shift, and go to state 25</a>
+    '*'   <a href="#state_26">shift, and go to state 26</a>
+
+    name_list       <a href="#state_27">go to state 27</a>
+    select_col_chk  <a href="#state_28">go to state 28</a>
+</p>
+
+<h3><a name="state_4" id="state_4"></a>state 4</h3>
+
+<p class="pre">  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <b>delete_k</b> <span class="point">.</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    from_k  <a href="#state_29">shift, and go to state 29</a>
+</p>
+
+<h3><a name="state_5" id="state_5"></a>state 5</h3>
+
+<p class="pre">  <a href="#rule_13"> 13</a> <span class="i">drop_stmt</span> → <b>drop_k</b> <span class="point">.</span> <span class="i">type_drop</span>
+  <a href="#rule_14"> 14</a> <span class="i">type_drop</span> → <span class="point">.</span> <b>database_k</b> <b>name</b>
+  <a href="#rule_15"> 15</a>           | <span class="point">.</span> <b>table_k</b> <span class="i">name_list</span>
+  <a href="#rule_16"> 16</a>           | <span class="point">.</span> <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b>
+  <a href="#rule_17"> 17</a>           | <span class="point">.</span> <b>view_k</b> <span class="i">name_list</span>
+
+    database_k  <a href="#state_30">shift, and go to state 30</a>
+    table_k     <a href="#state_31">shift, and go to state 31</a>
+    index_k     <a href="#state_32">shift, and go to state 32</a>
+    view_k      <a href="#state_33">shift, and go to state 33</a>
+
+    type_drop  <a href="#state_34">go to state 34</a>
+</p>
+
+<h3><a name="state_6" id="state_6"></a>state 6</h3>
+
+<p class="pre">  <a href="#rule_18"> 18</a> <span class="i">create_stmt</span> → <b>create_k</b> <span class="point">.</span> <span class="i">type_create</span>
+  <a href="#rule_19"> 19</a> <span class="i">type_create</span> → <span class="point">.</span> <b>database_k</b> <b>name</b>
+  <a href="#rule_20"> 20</a>             | <span class="point">.</span> <b>table_k</b> <b>name</b> <b>'('</b> <span class="i">create_def_list</span> <b>')'</b>
+  <a href="#rule_21"> 21</a>             | <span class="point">.</span> <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_22"> 22</a>             | <span class="point">.</span> <b>view_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>as_k</b> <span class="i">select_stmt</span>
+
+    database_k  <a href="#state_35">shift, and go to state 35</a>
+    table_k     <a href="#state_36">shift, and go to state 36</a>
+    index_k     <a href="#state_37">shift, and go to state 37</a>
+    view_k      <a href="#state_38">shift, and go to state 38</a>
+
+    type_create  <a href="#state_39">go to state 39</a>
+</p>
+
+<h3><a name="state_7" id="state_7"></a>state 7</h3>
+
+<p class="pre">  <a href="#rule_43"> 43</a> <span class="i">rename_stmt</span> → <b>rename_k</b> <span class="point">.</span> <b>table_k</b> <span class="i">rename_list</span>
+
+    table_k  <a href="#state_40">shift, and go to state 40</a>
+</p>
+
+<h3><a name="state_8" id="state_8"></a>state 8</h3>
+
+<p class="pre">  <a href="#rule_96"> 96</a> <span class="i">alter_stmt</span> → <b>alter_k</b> <span class="point">.</span> <b>table_k</b> <b>name</b> <span class="i">alter_spec_list</span>
+
+    table_k  <a href="#state_41">shift, and go to state 41</a>
+</p>
+
+<h3><a name="state_9" id="state_9"></a>state 9</h3>
+
+<p class="pre">  <a href="#rule_46"> 46</a> <span class="i">use_stmt</span> → <b>use_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_42">shift, and go to state 42</a>
+</p>
+
+<h3><a name="state_10" id="state_10"></a>state 10</h3>
+
+<p class="pre">  <a href="#rule_47"> 47</a> <span class="i">show_stmt</span> → <b>show_k</b> <span class="point">.</span> <span class="i">type_show</span>
+  <a href="#rule_48"> 48</a> <span class="i">type_show</span> → <span class="point">.</span> <b>databases_k</b>
+  <a href="#rule_49"> 49</a>           | <span class="point">.</span> <b>tables_k</b> <span class="i">opt_name</span>
+  <a href="#rule_50"> 50</a>           | <span class="point">.</span> <b>columns_k</b> <b>in_k</b> <b>name</b> <span class="i">opt_name</span>
+
+    databases_k  <a href="#state_43">shift, and go to state 43</a>
+    tables_k     <a href="#state_44">shift, and go to state 44</a>
+    columns_k    <a href="#state_45">shift, and go to state 45</a>
+
+    type_show  <a href="#state_46">go to state 46</a>
+</p>
+
+<h3><a name="state_11" id="state_11"></a>state 11</h3>
+
+<p class="pre">  <a href="#rule_0">  0</a> <span class="i">$accept</span> → <span class="i">sql</span> <span class="point">.</span> <b>$end</b>
+
+    $end  <a href="#state_47">shift, and go to state 47</a>
+</p>
+
+<h3><a name="state_12" id="state_12"></a>state 12</h3>
+
+<p class="pre">  <a href="#rule_1">  1</a> <span class="i">sql</span> → <span class="i">sql_stmt</span> <span class="point">.</span> <b>';'</b>
+
+    ';'  <a href="#state_48">shift, and go to state 48</a>
+</p>
+
+<h3><a name="state_13" id="state_13"></a>state 13</h3>
+
+<p class="pre">  <a href="#rule_5">  5</a> <span class="i">sql_stmt</span> → <span class="i">drop_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_5">reduce using rule 5</a> (sql_stmt)
+</p>
+
+<h3><a name="state_14" id="state_14"></a>state 14</h3>
+
+<p class="pre">  <a href="#rule_6">  6</a> <span class="i">sql_stmt</span> → <span class="i">create_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_6">reduce using rule 6</a> (sql_stmt)
+</p>
+
+<h3><a name="state_15" id="state_15"></a>state 15</h3>
+
+<p class="pre">  <a href="#rule_9">  9</a> <span class="i">sql_stmt</span> → <span class="i">rename_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_9">reduce using rule 9</a> (sql_stmt)
+</p>
+
+<h3><a name="state_16" id="state_16"></a>state 16</h3>
+
+<p class="pre">  <a href="#rule_11"> 11</a> <span class="i">sql_stmt</span> → <span class="i">use_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_11">reduce using rule 11</a> (sql_stmt)
+</p>
+
+<h3><a name="state_17" id="state_17"></a>state 17</h3>
+
+<p class="pre">  <a href="#rule_12"> 12</a> <span class="i">sql_stmt</span> → <span class="i">show_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_12">reduce using rule 12</a> (sql_stmt)
+</p>
+
+<h3><a name="state_18" id="state_18"></a>state 18</h3>
+
+<p class="pre">  <a href="#rule_7">  7</a> <span class="i">sql_stmt</span> → <span class="i">insert_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_7">reduce using rule 7</a> (sql_stmt)
+</p>
+
+<h3><a name="state_19" id="state_19"></a>state 19</h3>
+
+<p class="pre">  <a href="#rule_8">  8</a> <span class="i">sql_stmt</span> → <span class="i">delete_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_8">reduce using rule 8</a> (sql_stmt)
+</p>
+
+<h3><a name="state_20" id="state_20"></a>state 20</h3>
+
+<p class="pre">  <a href="#rule_4">  4</a> <span class="i">sql_stmt</span> → <span class="i">select_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_4">reduce using rule 4</a> (sql_stmt)
+</p>
+
+<h3><a name="state_21" id="state_21"></a>state 21</h3>
+
+<p class="pre">  <a href="#rule_3">  3</a> <span class="i">sql_stmt</span> → <span class="i">update_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_3">reduce using rule 3</a> (sql_stmt)
+</p>
+
+<h3><a name="state_22" id="state_22"></a>state 22</h3>
+
+<p class="pre">  <a href="#rule_10"> 10</a> <span class="i">sql_stmt</span> → <span class="i">alter_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_10">reduce using rule 10</a> (sql_stmt)
+</p>
+
+<h3><a name="state_23" id="state_23"></a>state 23</h3>
+
+<p class="pre">  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <b>insert_k</b> <b>into_k</b> <span class="point">.</span> <b>name</b> <span class="i">col_list_chk</span> <b>values_k</b> <span class="i">val_set</span>
+
+    name  <a href="#state_49">shift, and go to state 49</a>
+</p>
+
+<h3><a name="state_24" id="state_24"></a>state 24</h3>
+
+<p class="pre">  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <span class="point">.</span> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    set_k  <a href="#state_50">shift, and go to state 50</a>
+</p>
+
+<h3><a name="state_25" id="state_25"></a>state 25</h3>
+
+<p class="pre">  <a href="#rule_56"> 56</a> <span class="i">name_list</span> → <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_56">reduce using rule 56</a> (name_list)
+</p>
+
+<h3><a name="state_26" id="state_26"></a>state 26</h3>
+
+<p class="pre">  <a href="#rule_69"> 69</a> <span class="i">select_col_chk</span> → <b>'*'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_69">reduce using rule 69</a> (select_col_chk)
+</p>
+
+<h3><a name="state_27" id="state_27"></a>state 27</h3>
+
+<p class="pre">  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <span class="point">.</span> <b>','</b> <b>name</b>
+  <a href="#rule_70"> 70</a> <span class="i">select_col_chk</span> → <span class="i">name_list</span> <span class="point">.</span>  [from_k]
+
+    ','  <a href="#state_51">shift, and go to state 51</a>
+
+    $default  <a href="#rule_70">reduce using rule 70</a> (select_col_chk)
+</p>
+
+<h3><a name="state_28" id="state_28"></a>state 28</h3>
+
+<p class="pre">  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <span class="point">.</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    from_k  <a href="#state_52">shift, and go to state 52</a>
+</p>
+
+<h3><a name="state_29" id="state_29"></a>state 29</h3>
+
+<p class="pre">  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <b>delete_k</b> <b>from_k</b> <span class="point">.</span> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    name  <a href="#state_53">shift, and go to state 53</a>
+</p>
+
+<h3><a name="state_30" id="state_30"></a>state 30</h3>
+
+<p class="pre">  <a href="#rule_14"> 14</a> <span class="i">type_drop</span> → <b>database_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_54">shift, and go to state 54</a>
+</p>
+
+<h3><a name="state_31" id="state_31"></a>state 31</h3>
+
+<p class="pre">  <a href="#rule_15"> 15</a> <span class="i">type_drop</span> → <b>table_k</b> <span class="point">.</span> <span class="i">name_list</span>
+  <a href="#rule_56"> 56</a> <span class="i">name_list</span> → <span class="point">.</span> <b>name</b>
+  <a href="#rule_57"> 57</a>           | <span class="point">.</span> <span class="i">name_list</span> <b>','</b> <b>name</b>
+
+    name  <a href="#state_25">shift, and go to state 25</a>
+
+    name_list  <a href="#state_55">go to state 55</a>
+</p>
+
+<h3><a name="state_32" id="state_32"></a>state 32</h3>
+
+<p class="pre">  <a href="#rule_16"> 16</a> <span class="i">type_drop</span> → <b>index_k</b> <span class="point">.</span> <b>name</b> <b>on_k</b> <b>name</b>
+
+    name  <a href="#state_56">shift, and go to state 56</a>
+</p>
+
+<h3><a name="state_33" id="state_33"></a>state 33</h3>
+
+<p class="pre">  <a href="#rule_17"> 17</a> <span class="i">type_drop</span> → <b>view_k</b> <span class="point">.</span> <span class="i">name_list</span>
+  <a href="#rule_56"> 56</a> <span class="i">name_list</span> → <span class="point">.</span> <b>name</b>
+  <a href="#rule_57"> 57</a>           | <span class="point">.</span> <span class="i">name_list</span> <b>','</b> <b>name</b>
+
+    name  <a href="#state_25">shift, and go to state 25</a>
+
+    name_list  <a href="#state_57">go to state 57</a>
+</p>
+
+<h3><a name="state_34" id="state_34"></a>state 34</h3>
+
+<p class="pre">  <a href="#rule_13"> 13</a> <span class="i">drop_stmt</span> → <b>drop_k</b> <span class="i">type_drop</span> <span class="point">.</span>
+
+    $default  <a href="#rule_13">reduce using rule 13</a> (drop_stmt)
+</p>
+
+<h3><a name="state_35" id="state_35"></a>state 35</h3>
+
+<p class="pre">  <a href="#rule_19"> 19</a> <span class="i">type_create</span> → <b>database_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_58">shift, and go to state 58</a>
+</p>
+
+<h3><a name="state_36" id="state_36"></a>state 36</h3>
+
+<p class="pre">  <a href="#rule_20"> 20</a> <span class="i">type_create</span> → <b>table_k</b> <span class="point">.</span> <b>name</b> <b>'('</b> <span class="i">create_def_list</span> <b>')'</b>
+
+    name  <a href="#state_59">shift, and go to state 59</a>
+</p>
+
+<h3><a name="state_37" id="state_37"></a>state 37</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <span class="point">.</span> <b>name</b> <b>on_k</b> <b>name</b> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+
+    name  <a href="#state_60">shift, and go to state 60</a>
+</p>
+
+<h3><a name="state_38" id="state_38"></a>state 38</h3>
+
+<p class="pre">  <a href="#rule_22"> 22</a> <span class="i">type_create</span> → <b>view_k</b> <span class="point">.</span> <b>name</b> <span class="i">col_list_chk</span> <b>as_k</b> <span class="i">select_stmt</span>
+
+    name  <a href="#state_61">shift, and go to state 61</a>
+</p>
+
+<h3><a name="state_39" id="state_39"></a>state 39</h3>
+
+<p class="pre">  <a href="#rule_18"> 18</a> <span class="i">create_stmt</span> → <b>create_k</b> <span class="i">type_create</span> <span class="point">.</span>
+
+    $default  <a href="#rule_18">reduce using rule 18</a> (create_stmt)
+</p>
+
+<h3><a name="state_40" id="state_40"></a>state 40</h3>
+
+<p class="pre">  <a href="#rule_43"> 43</a> <span class="i">rename_stmt</span> → <b>rename_k</b> <b>table_k</b> <span class="point">.</span> <span class="i">rename_list</span>
+  <a href="#rule_44"> 44</a> <span class="i">rename_list</span> → <span class="point">.</span> <b>name</b> <b>to_k</b> <b>name</b>
+  <a href="#rule_45"> 45</a>             | <span class="point">.</span> <span class="i">rename_list</span> <b>','</b> <b>name</b> <b>to_k</b> <b>name</b>
+
+    name  <a href="#state_62">shift, and go to state 62</a>
+
+    rename_list  <a href="#state_63">go to state 63</a>
+</p>
+
+<h3><a name="state_41" id="state_41"></a>state 41</h3>
+
+<p class="pre">  <a href="#rule_96"> 96</a> <span class="i">alter_stmt</span> → <b>alter_k</b> <b>table_k</b> <span class="point">.</span> <b>name</b> <span class="i">alter_spec_list</span>
+
+    name  <a href="#state_64">shift, and go to state 64</a>
+</p>
+
+<h3><a name="state_42" id="state_42"></a>state 42</h3>
+
+<p class="pre">  <a href="#rule_46"> 46</a> <span class="i">use_stmt</span> → <b>use_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_46">reduce using rule 46</a> (use_stmt)
+</p>
+
+<h3><a name="state_43" id="state_43"></a>state 43</h3>
+
+<p class="pre">  <a href="#rule_48"> 48</a> <span class="i">type_show</span> → <b>databases_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_48">reduce using rule 48</a> (type_show)
+</p>
+
+<h3><a name="state_44" id="state_44"></a>state 44</h3>
+
+<p class="pre">  <a href="#rule_49"> 49</a> <span class="i">type_show</span> → <b>tables_k</b> <span class="point">.</span> <span class="i">opt_name</span>
+  <a href="#rule_51"> 51</a> <span class="i">opt_name</span> → <span class="point">.</span> <b>in_k</b> <b>name</b>
+  <a href="#rule_52"> 52</a>          | <span class="point">.</span> %empty  [';']
+
+    in_k  <a href="#state_65">shift, and go to state 65</a>
+
+    $default  <a href="#rule_52">reduce using rule 52</a> (opt_name)
+
+    opt_name  <a href="#state_66">go to state 66</a>
+</p>
+
+<h3><a name="state_45" id="state_45"></a>state 45</h3>
+
+<p class="pre">  <a href="#rule_50"> 50</a> <span class="i">type_show</span> → <b>columns_k</b> <span class="point">.</span> <b>in_k</b> <b>name</b> <span class="i">opt_name</span>
+
+    in_k  <a href="#state_67">shift, and go to state 67</a>
+</p>
+
+<h3><a name="state_46" id="state_46"></a>state 46</h3>
+
+<p class="pre">  <a href="#rule_47"> 47</a> <span class="i">show_stmt</span> → <b>show_k</b> <span class="i">type_show</span> <span class="point">.</span>
+
+    $default  <a href="#rule_47">reduce using rule 47</a> (show_stmt)
+</p>
+
+<h3><a name="state_47" id="state_47"></a>state 47</h3>
+
+<p class="pre">  <a href="#rule_0">  0</a> <span class="i">$accept</span> → <span class="i">sql</span> <b>$end</b> <span class="point">.</span>
+
+    $default  accept
+</p>
+
+<h3><a name="state_48" id="state_48"></a>state 48</h3>
+
+<p class="pre">  <a href="#rule_1">  1</a> <span class="i">sql</span> → <span class="i">sql_stmt</span> <b>';'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_1">reduce using rule 1</a> (sql)
+</p>
+
+<h3><a name="state_49" id="state_49"></a>state 49</h3>
+
+<p class="pre">  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <b>insert_k</b> <b>into_k</b> <b>name</b> <span class="point">.</span> <span class="i">col_list_chk</span> <b>values_k</b> <span class="i">val_set</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [values_k]
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_69">go to state 69</a>
+</p>
+
+<h3><a name="state_50" id="state_50"></a>state 50</h3>
+
+<p class="pre">  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <b>set_k</b> <span class="point">.</span> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_91"> 91</a> <span class="i">set_list</span> → <span class="point">.</span> <span class="i">set_single</span>
+  <a href="#rule_92"> 92</a>          | <span class="point">.</span> <span class="i">set_list</span> <b>','</b> <span class="i">set_single</span>
+  <a href="#rule_93"> 93</a> <span class="i">set_single</span> → <span class="point">.</span> <b>name</b> <b>'='</b> <span class="i">data</span>
+
+    name  <a href="#state_70">shift, and go to state 70</a>
+
+    set_list    <a href="#state_71">go to state 71</a>
+    set_single  <a href="#state_72">go to state 72</a>
+</p>
+
+<h3><a name="state_51" id="state_51"></a>state 51</h3>
+
+<p class="pre">  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <b>','</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_73">shift, and go to state 73</a>
+</p>
+
+<h3><a name="state_52" id="state_52"></a>state 52</h3>
+
+<p class="pre">  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <span class="point">.</span> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    name  <a href="#state_74">shift, and go to state 74</a>
+</p>
+
+<h3><a name="state_53" id="state_53"></a>state 53</h3>
+
+<p class="pre">  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <b>delete_k</b> <b>from_k</b> <b>name</b> <span class="point">.</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_71"> 71</a> <span class="i">where_stmt</span> → <span class="point">.</span> <b>where_k</b> <span class="i">where_cond</span>
+  <a href="#rule_72"> 72</a>            | <span class="point">.</span> %empty  [order_k, limit_k, ';']
+
+    where_k  <a href="#state_75">shift, and go to state 75</a>
+
+    $default  <a href="#rule_72">reduce using rule 72</a> (where_stmt)
+
+    where_stmt  <a href="#state_76">go to state 76</a>
+</p>
+
+<h3><a name="state_54" id="state_54"></a>state 54</h3>
+
+<p class="pre">  <a href="#rule_14"> 14</a> <span class="i">type_drop</span> → <b>database_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_14">reduce using rule 14</a> (type_drop)
+</p>
+
+<h3><a name="state_55" id="state_55"></a>state 55</h3>
+
+<p class="pre">  <a href="#rule_15"> 15</a> <span class="i">type_drop</span> → <b>table_k</b> <span class="i">name_list</span> <span class="point">.</span>  [';']
+  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <span class="point">.</span> <b>','</b> <b>name</b>
+
+    ','  <a href="#state_51">shift, and go to state 51</a>
+
+    $default  <a href="#rule_15">reduce using rule 15</a> (type_drop)
+</p>
+
+<h3><a name="state_56" id="state_56"></a>state 56</h3>
+
+<p class="pre">  <a href="#rule_16"> 16</a> <span class="i">type_drop</span> → <b>index_k</b> <b>name</b> <span class="point">.</span> <b>on_k</b> <b>name</b>
+
+    on_k  <a href="#state_77">shift, and go to state 77</a>
+</p>
+
+<h3><a name="state_57" id="state_57"></a>state 57</h3>
+
+<p class="pre">  <a href="#rule_17"> 17</a> <span class="i">type_drop</span> → <b>view_k</b> <span class="i">name_list</span> <span class="point">.</span>  [';']
+  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <span class="point">.</span> <b>','</b> <b>name</b>
+
+    ','  <a href="#state_51">shift, and go to state 51</a>
+
+    $default  <a href="#rule_17">reduce using rule 17</a> (type_drop)
+</p>
+
+<h3><a name="state_58" id="state_58"></a>state 58</h3>
+
+<p class="pre">  <a href="#rule_19"> 19</a> <span class="i">type_create</span> → <b>database_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_19">reduce using rule 19</a> (type_create)
+</p>
+
+<h3><a name="state_59" id="state_59"></a>state 59</h3>
+
+<p class="pre">  <a href="#rule_20"> 20</a> <span class="i">type_create</span> → <b>table_k</b> <b>name</b> <span class="point">.</span> <b>'('</b> <span class="i">create_def_list</span> <b>')'</b>
+
+    '('  <a href="#state_78">shift, and go to state 78</a>
+</p>
+
+<h3><a name="state_60" id="state_60"></a>state 60</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <b>name</b> <span class="point">.</span> <b>on_k</b> <b>name</b> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+
+    on_k  <a href="#state_79">shift, and go to state 79</a>
+</p>
+
+<h3><a name="state_61" id="state_61"></a>state 61</h3>
+
+<p class="pre">  <a href="#rule_22"> 22</a> <span class="i">type_create</span> → <b>view_k</b> <b>name</b> <span class="point">.</span> <span class="i">col_list_chk</span> <b>as_k</b> <span class="i">select_stmt</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [as_k]
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_80">go to state 80</a>
+</p>
+
+<h3><a name="state_62" id="state_62"></a>state 62</h3>
+
+<p class="pre">  <a href="#rule_44"> 44</a> <span class="i">rename_list</span> → <b>name</b> <span class="point">.</span> <b>to_k</b> <b>name</b>
+
+    to_k  <a href="#state_81">shift, and go to state 81</a>
+</p>
+
+<h3><a name="state_63" id="state_63"></a>state 63</h3>
+
+<p class="pre">  <a href="#rule_43"> 43</a> <span class="i">rename_stmt</span> → <b>rename_k</b> <b>table_k</b> <span class="i">rename_list</span> <span class="point">.</span>  [';']
+  <a href="#rule_45"> 45</a> <span class="i">rename_list</span> → <span class="i">rename_list</span> <span class="point">.</span> <b>','</b> <b>name</b> <b>to_k</b> <b>name</b>
+
+    ','  <a href="#state_82">shift, and go to state 82</a>
+
+    $default  <a href="#rule_43">reduce using rule 43</a> (rename_stmt)
+</p>
+
+<h3><a name="state_64" id="state_64"></a>state 64</h3>
+
+<p class="pre">  <a href="#rule_96"> 96</a> <span class="i">alter_stmt</span> → <b>alter_k</b> <b>table_k</b> <b>name</b> <span class="point">.</span> <span class="i">alter_spec_list</span>
+  <a href="#rule_97"> 97</a> <span class="i">alter_spec_list</span> → <span class="point">.</span> <span class="i">alter_spec</span>
+  <a href="#rule_98"> 98</a>                 | <span class="point">.</span> <span class="i">alter_spec_list</span> <b>','</b> <span class="i">alter_spec</span>
+  <a href="#rule_103">103</a> <span class="i">alter_spec</span> → <span class="point">.</span> <b>add_k</b> <span class="i">add_col_def</span>
+  <a href="#rule_104">104</a>            | <span class="point">.</span> <b>add_k</b> <b>constraint_k</b> <span class="i">constraints</span>
+  <a href="#rule_105">105</a>            | <span class="point">.</span> <b>change_k</b> <b>name</b> <span class="i">col_def</span>
+
+    add_k     <a href="#state_83">shift, and go to state 83</a>
+    change_k  <a href="#state_84">shift, and go to state 84</a>
+
+    alter_spec_list  <a href="#state_85">go to state 85</a>
+    alter_spec       <a href="#state_86">go to state 86</a>
+</p>
+
+<h3><a name="state_65" id="state_65"></a>state 65</h3>
+
+<p class="pre">  <a href="#rule_51"> 51</a> <span class="i">opt_name</span> → <b>in_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_87">shift, and go to state 87</a>
+</p>
+
+<h3><a name="state_66" id="state_66"></a>state 66</h3>
+
+<p class="pre">  <a href="#rule_49"> 49</a> <span class="i">type_show</span> → <b>tables_k</b> <span class="i">opt_name</span> <span class="point">.</span>
+
+    $default  <a href="#rule_49">reduce using rule 49</a> (type_show)
+</p>
+
+<h3><a name="state_67" id="state_67"></a>state 67</h3>
+
+<p class="pre">  <a href="#rule_50"> 50</a> <span class="i">type_show</span> → <b>columns_k</b> <b>in_k</b> <span class="point">.</span> <b>name</b> <span class="i">opt_name</span>
+
+    name  <a href="#state_88">shift, and go to state 88</a>
+</p>
+
+<h3><a name="state_68" id="state_68"></a>state 68</h3>
+
+<p class="pre">  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <b>'('</b> <span class="point">.</span> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_56"> 56</a> <span class="i">name_list</span> → <span class="point">.</span> <b>name</b>
+  <a href="#rule_57"> 57</a>           | <span class="point">.</span> <span class="i">name_list</span> <b>','</b> <b>name</b>
+
+    name  <a href="#state_25">shift, and go to state 25</a>
+
+    name_list  <a href="#state_89">go to state 89</a>
+</p>
+
+<h3><a name="state_69" id="state_69"></a>state 69</h3>
+
+<p class="pre">  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <b>insert_k</b> <b>into_k</b> <b>name</b> <span class="i">col_list_chk</span> <span class="point">.</span> <b>values_k</b> <span class="i">val_set</span>
+
+    values_k  <a href="#state_90">shift, and go to state 90</a>
+</p>
+
+<h3><a name="state_70" id="state_70"></a>state 70</h3>
+
+<p class="pre">  <a href="#rule_93"> 93</a> <span class="i">set_single</span> → <b>name</b> <span class="point">.</span> <b>'='</b> <span class="i">data</span>
+
+    '='  <a href="#state_91">shift, and go to state 91</a>
+</p>
+
+<h3><a name="state_71" id="state_71"></a>state 71</h3>
+
+<p class="pre">  <a href="#rule_71"> 71</a> <span class="i">where_stmt</span> → <span class="point">.</span> <b>where_k</b> <span class="i">where_cond</span>
+  <a href="#rule_72"> 72</a>            | <span class="point">.</span> %empty  [order_k, limit_k, ';']
+  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="point">.</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_92"> 92</a> <span class="i">set_list</span> → <span class="i">set_list</span> <span class="point">.</span> <b>','</b> <span class="i">set_single</span>
+
+    where_k  <a href="#state_75">shift, and go to state 75</a>
+    ','      <a href="#state_92">shift, and go to state 92</a>
+
+    $default  <a href="#rule_72">reduce using rule 72</a> (where_stmt)
+
+    where_stmt  <a href="#state_93">go to state 93</a>
+</p>
+
+<h3><a name="state_72" id="state_72"></a>state 72</h3>
+
+<p class="pre">  <a href="#rule_91"> 91</a> <span class="i">set_list</span> → <span class="i">set_single</span> <span class="point">.</span>
+
+    $default  <a href="#rule_91">reduce using rule 91</a> (set_list)
+</p>
+
+<h3><a name="state_73" id="state_73"></a>state 73</h3>
+
+<p class="pre">  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <b>','</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_57">reduce using rule 57</a> (name_list)
+</p>
+
+<h3><a name="state_74" id="state_74"></a>state 74</h3>
+
+<p class="pre">  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="point">.</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_71"> 71</a> <span class="i">where_stmt</span> → <span class="point">.</span> <b>where_k</b> <span class="i">where_cond</span>
+  <a href="#rule_72"> 72</a>            | <span class="point">.</span> %empty  [order_k, limit_k, ';']
+
+    where_k  <a href="#state_75">shift, and go to state 75</a>
+
+    $default  <a href="#rule_72">reduce using rule 72</a> (where_stmt)
+
+    where_stmt  <a href="#state_94">go to state 94</a>
+</p>
+
+<h3><a name="state_75" id="state_75"></a>state 75</h3>
+
+<p class="pre">  <a href="#rule_71"> 71</a> <span class="i">where_stmt</span> → <b>where_k</b> <span class="point">.</span> <span class="i">where_cond</span>
+  <a href="#rule_73"> 73</a> <span class="i">where_cond</span> → <span class="point">.</span> <span class="i">exp</span>
+  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="point">.</span> <span class="i">exp</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="point">.</span> <span class="i">exp</span> <b>or_k</b> <span class="i">exp</span>
+  <a href="#rule_76"> 76</a>     | <span class="point">.</span> <b>'('</b> <span class="i">exp</span> <b>')'</b>
+  <a href="#rule_77"> 77</a>     | <span class="point">.</span> <span class="i">cond_exp</span>
+  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <span class="point">.</span> <b>name</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_79"> 79</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <span class="i">data</span>
+  <a href="#rule_80"> 80</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <span class="i">data</span>
+  <a href="#rule_81"> 81</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_82"> 82</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_83"> 83</a>          | <span class="point">.</span> <b>name</b> <b>'!'</b> <b>'='</b> <span class="i">data</span>
+
+    name  <a href="#state_95">shift, and go to state 95</a>
+    '('   <a href="#state_96">shift, and go to state 96</a>
+
+    where_cond  <a href="#state_97">go to state 97</a>
+    exp         <a href="#state_98">go to state 98</a>
+    cond_exp    <a href="#state_99">go to state 99</a>
+</p>
+
+<h3><a name="state_76" id="state_76"></a>state 76</h3>
+
+<p class="pre">  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <b>delete_k</b> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="point">.</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_84"> 84</a> <span class="i">orderby_stmt</span> → <span class="point">.</span> <b>order_k</b> <b>by_k</b> <span class="i">orderby_list</span>
+  <a href="#rule_85"> 85</a>              | <span class="point">.</span> %empty  [limit_k, ';']
+
+    order_k  <a href="#state_100">shift, and go to state 100</a>
+
+    $default  <a href="#rule_85">reduce using rule 85</a> (orderby_stmt)
+
+    orderby_stmt  <a href="#state_101">go to state 101</a>
+</p>
+
+<h3><a name="state_77" id="state_77"></a>state 77</h3>
+
+<p class="pre">  <a href="#rule_16"> 16</a> <span class="i">type_drop</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_102">shift, and go to state 102</a>
+</p>
+
+<h3><a name="state_78" id="state_78"></a>state 78</h3>
+
+<p class="pre">  <a href="#rule_20"> 20</a> <span class="i">type_create</span> → <b>table_k</b> <b>name</b> <b>'('</b> <span class="point">.</span> <span class="i">create_def_list</span> <b>')'</b>
+  <a href="#rule_23"> 23</a> <span class="i">create_def_list</span> → <span class="point">.</span> <span class="i">create_def</span>
+  <a href="#rule_24"> 24</a>                 | <span class="point">.</span> <span class="i">create_def_list</span> <b>','</b> <span class="i">create_def</span>
+  <a href="#rule_25"> 25</a> <span class="i">create_def</span> → <span class="point">.</span> <span class="i">col_def</span>
+  <a href="#rule_26"> 26</a>            | <span class="point">.</span> <span class="i">constraints</span>
+  <a href="#rule_27"> 27</a> <span class="i">constraints</span> → <span class="point">.</span> <b>primary_k</b> <b>key_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_28"> 28</a>             | <span class="point">.</span> <b>index_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_29"> 29</a>             | <span class="point">.</span> <b>unique_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_30"> 30</a>             | <span class="point">.</span> <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <span class="point">.</span> <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+
+    primary_k  <a href="#state_103">shift, and go to state 103</a>
+    index_k    <a href="#state_104">shift, and go to state 104</a>
+    unique_k   <a href="#state_105">shift, and go to state 105</a>
+    foreign_k  <a href="#state_106">shift, and go to state 106</a>
+    name       <a href="#state_107">shift, and go to state 107</a>
+
+    create_def_list  <a href="#state_108">go to state 108</a>
+    create_def       <a href="#state_109">go to state 109</a>
+    constraints      <a href="#state_110">go to state 110</a>
+    col_def          <a href="#state_111">go to state 111</a>
+</p>
+
+<h3><a name="state_79" id="state_79"></a>state 79</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <span class="point">.</span> <b>name</b> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+
+    name  <a href="#state_112">shift, and go to state 112</a>
+</p>
+
+<h3><a name="state_80" id="state_80"></a>state 80</h3>
+
+<p class="pre">  <a href="#rule_22"> 22</a> <span class="i">type_create</span> → <b>view_k</b> <b>name</b> <span class="i">col_list_chk</span> <span class="point">.</span> <b>as_k</b> <span class="i">select_stmt</span>
+
+    as_k  <a href="#state_113">shift, and go to state 113</a>
+</p>
+
+<h3><a name="state_81" id="state_81"></a>state 81</h3>
+
+<p class="pre">  <a href="#rule_44"> 44</a> <span class="i">rename_list</span> → <b>name</b> <b>to_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_114">shift, and go to state 114</a>
+</p>
+
+<h3><a name="state_82" id="state_82"></a>state 82</h3>
+
+<p class="pre">  <a href="#rule_45"> 45</a> <span class="i">rename_list</span> → <span class="i">rename_list</span> <b>','</b> <span class="point">.</span> <b>name</b> <b>to_k</b> <b>name</b>
+
+    name  <a href="#state_115">shift, and go to state 115</a>
+</p>
+
+<h3><a name="state_83" id="state_83"></a>state 83</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <span class="point">.</span> <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+  <a href="#rule_99"> 99</a> <span class="i">add_col_def</span> → <span class="point">.</span> <span class="i">col_def</span>
+  <a href="#rule_100">100</a>             | <span class="point">.</span> <b>'('</b> <span class="i">col_def_list</span> <b>')'</b>
+  <a href="#rule_103">103</a> <span class="i">alter_spec</span> → <b>add_k</b> <span class="point">.</span> <span class="i">add_col_def</span>
+  <a href="#rule_104">104</a>            | <b>add_k</b> <span class="point">.</span> <b>constraint_k</b> <span class="i">constraints</span>
+
+    constraint_k  <a href="#state_116">shift, and go to state 116</a>
+    name          <a href="#state_107">shift, and go to state 107</a>
+    '('           <a href="#state_117">shift, and go to state 117</a>
+
+    col_def      <a href="#state_118">go to state 118</a>
+    add_col_def  <a href="#state_119">go to state 119</a>
+</p>
+
+<h3><a name="state_84" id="state_84"></a>state 84</h3>
+
+<p class="pre">  <a href="#rule_105">105</a> <span class="i">alter_spec</span> → <b>change_k</b> <span class="point">.</span> <b>name</b> <span class="i">col_def</span>
+
+    name  <a href="#state_120">shift, and go to state 120</a>
+</p>
+
+<h3><a name="state_85" id="state_85"></a>state 85</h3>
+
+<p class="pre">  <a href="#rule_96"> 96</a> <span class="i">alter_stmt</span> → <b>alter_k</b> <b>table_k</b> <b>name</b> <span class="i">alter_spec_list</span> <span class="point">.</span>  [';']
+  <a href="#rule_98"> 98</a> <span class="i">alter_spec_list</span> → <span class="i">alter_spec_list</span> <span class="point">.</span> <b>','</b> <span class="i">alter_spec</span>
+
+    ','  <a href="#state_121">shift, and go to state 121</a>
+
+    $default  <a href="#rule_96">reduce using rule 96</a> (alter_stmt)
+</p>
+
+<h3><a name="state_86" id="state_86"></a>state 86</h3>
+
+<p class="pre">  <a href="#rule_97"> 97</a> <span class="i">alter_spec_list</span> → <span class="i">alter_spec</span> <span class="point">.</span>
+
+    $default  <a href="#rule_97">reduce using rule 97</a> (alter_spec_list)
+</p>
+
+<h3><a name="state_87" id="state_87"></a>state 87</h3>
+
+<p class="pre">  <a href="#rule_51"> 51</a> <span class="i">opt_name</span> → <b>in_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_51">reduce using rule 51</a> (opt_name)
+</p>
+
+<h3><a name="state_88" id="state_88"></a>state 88</h3>
+
+<p class="pre">  <a href="#rule_50"> 50</a> <span class="i">type_show</span> → <b>columns_k</b> <b>in_k</b> <b>name</b> <span class="point">.</span> <span class="i">opt_name</span>
+  <a href="#rule_51"> 51</a> <span class="i">opt_name</span> → <span class="point">.</span> <b>in_k</b> <b>name</b>
+  <a href="#rule_52"> 52</a>          | <span class="point">.</span> %empty  [';']
+
+    in_k  <a href="#state_65">shift, and go to state 65</a>
+
+    $default  <a href="#rule_52">reduce using rule 52</a> (opt_name)
+
+    opt_name  <a href="#state_122">go to state 122</a>
+</p>
+
+<h3><a name="state_89" id="state_89"></a>state 89</h3>
+
+<p class="pre">  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <b>'('</b> <span class="i">name_list</span> <span class="point">.</span> <b>')'</b>
+  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <span class="point">.</span> <b>','</b> <b>name</b>
+
+    ')'  <a href="#state_123">shift, and go to state 123</a>
+    ','  <a href="#state_51">shift, and go to state 51</a>
+</p>
+
+<h3><a name="state_90" id="state_90"></a>state 90</h3>
+
+<p class="pre">  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <b>insert_k</b> <b>into_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>values_k</b> <span class="point">.</span> <span class="i">val_set</span>
+  <a href="#rule_58"> 58</a> <span class="i">val_set</span> → <span class="point">.</span> <span class="i">val_list1</span>
+  <a href="#rule_59"> 59</a>         | <span class="point">.</span> <span class="i">val_set</span> <b>','</b> <span class="i">val_list1</span>
+  <a href="#rule_60"> 60</a> <span class="i">val_list1</span> → <span class="point">.</span> <b>'('</b> <span class="i">val_list</span> <b>')'</b>
+
+    '('  <a href="#state_124">shift, and go to state 124</a>
+
+    val_set    <a href="#state_125">go to state 125</a>
+    val_list1  <a href="#state_126">go to state 126</a>
+</p>
+
+<h3><a name="state_91" id="state_91"></a>state 91</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_93"> 93</a> <span class="i">set_single</span> → <b>name</b> <b>'='</b> <span class="point">.</span> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    data  <a href="#state_130">go to state 130</a>
+</p>
+
+<h3><a name="state_92" id="state_92"></a>state 92</h3>
+
+<p class="pre">  <a href="#rule_92"> 92</a> <span class="i">set_list</span> → <span class="i">set_list</span> <b>','</b> <span class="point">.</span> <span class="i">set_single</span>
+  <a href="#rule_93"> 93</a> <span class="i">set_single</span> → <span class="point">.</span> <b>name</b> <b>'='</b> <span class="i">data</span>
+
+    name  <a href="#state_70">shift, and go to state 70</a>
+
+    set_single  <a href="#state_131">go to state 131</a>
+</p>
+
+<h3><a name="state_93" id="state_93"></a>state 93</h3>
+
+<p class="pre">  <a href="#rule_84"> 84</a> <span class="i">orderby_stmt</span> → <span class="point">.</span> <b>order_k</b> <b>by_k</b> <span class="i">orderby_list</span>
+  <a href="#rule_85"> 85</a>              | <span class="point">.</span> %empty  [limit_k, ';']
+  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="point">.</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    order_k  <a href="#state_100">shift, and go to state 100</a>
+
+    $default  <a href="#rule_85">reduce using rule 85</a> (orderby_stmt)
+
+    orderby_stmt  <a href="#state_132">go to state 132</a>
+</p>
+
+<h3><a name="state_94" id="state_94"></a>state 94</h3>
+
+<p class="pre">  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="point">.</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+  <a href="#rule_84"> 84</a> <span class="i">orderby_stmt</span> → <span class="point">.</span> <b>order_k</b> <b>by_k</b> <span class="i">orderby_list</span>
+  <a href="#rule_85"> 85</a>              | <span class="point">.</span> %empty  [limit_k, ';']
+
+    order_k  <a href="#state_100">shift, and go to state 100</a>
+
+    $default  <a href="#rule_85">reduce using rule 85</a> (orderby_stmt)
+
+    orderby_stmt  <a href="#state_133">go to state 133</a>
+</p>
+
+<h3><a name="state_95" id="state_95"></a>state 95</h3>
+
+<p class="pre">  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <b>name</b> <span class="point">.</span> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_79"> 79</a>          | <b>name</b> <span class="point">.</span> <b>'&lt;'</b> <span class="i">data</span>
+  <a href="#rule_80"> 80</a>          | <b>name</b> <span class="point">.</span> <b>'&gt;'</b> <span class="i">data</span>
+  <a href="#rule_81"> 81</a>          | <b>name</b> <span class="point">.</span> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_82"> 82</a>          | <b>name</b> <span class="point">.</span> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_83"> 83</a>          | <b>name</b> <span class="point">.</span> <b>'!'</b> <b>'='</b> <span class="i">data</span>
+
+    '='  <a href="#state_134">shift, and go to state 134</a>
+    '&lt;'  <a href="#state_135">shift, and go to state 135</a>
+    '&gt;'  <a href="#state_136">shift, and go to state 136</a>
+    '!'  <a href="#state_137">shift, and go to state 137</a>
+</p>
+
+<h3><a name="state_96" id="state_96"></a>state 96</h3>
+
+<p class="pre">  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="point">.</span> <span class="i">exp</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="point">.</span> <span class="i">exp</span> <b>or_k</b> <span class="i">exp</span>
+  <a href="#rule_76"> 76</a>     | <span class="point">.</span> <b>'('</b> <span class="i">exp</span> <b>')'</b>
+  <a href="#rule_76"> 76</a>     | <b>'('</b> <span class="point">.</span> <span class="i">exp</span> <b>')'</b>
+  <a href="#rule_77"> 77</a>     | <span class="point">.</span> <span class="i">cond_exp</span>
+  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <span class="point">.</span> <b>name</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_79"> 79</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <span class="i">data</span>
+  <a href="#rule_80"> 80</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <span class="i">data</span>
+  <a href="#rule_81"> 81</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_82"> 82</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_83"> 83</a>          | <span class="point">.</span> <b>name</b> <b>'!'</b> <b>'='</b> <span class="i">data</span>
+
+    name  <a href="#state_95">shift, and go to state 95</a>
+    '('   <a href="#state_96">shift, and go to state 96</a>
+
+    exp       <a href="#state_138">go to state 138</a>
+    cond_exp  <a href="#state_99">go to state 99</a>
+</p>
+
+<h3><a name="state_97" id="state_97"></a>state 97</h3>
+
+<p class="pre">  <a href="#rule_71"> 71</a> <span class="i">where_stmt</span> → <b>where_k</b> <span class="i">where_cond</span> <span class="point">.</span>
+
+    $default  <a href="#rule_71">reduce using rule 71</a> (where_stmt)
+</p>
+
+<h3><a name="state_98" id="state_98"></a>state 98</h3>
+
+<p class="pre">  <a href="#rule_73"> 73</a> <span class="i">where_cond</span> → <span class="i">exp</span> <span class="point">.</span>  [order_k, limit_k, ';']
+  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="i">exp</span> <span class="point">.</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="i">exp</span> <span class="point">.</span> <b>or_k</b> <span class="i">exp</span>
+
+    and_k  <a href="#state_139">shift, and go to state 139</a>
+    or_k   <a href="#state_140">shift, and go to state 140</a>
+
+    $default  <a href="#rule_73">reduce using rule 73</a> (where_cond)
+</p>
+
+<h3><a name="state_99" id="state_99"></a>state 99</h3>
+
+<p class="pre">  <a href="#rule_77"> 77</a> <span class="i">exp</span> → <span class="i">cond_exp</span> <span class="point">.</span>
+
+    $default  <a href="#rule_77">reduce using rule 77</a> (exp)
+</p>
+
+<h3><a name="state_100" id="state_100"></a>state 100</h3>
+
+<p class="pre">  <a href="#rule_84"> 84</a> <span class="i">orderby_stmt</span> → <b>order_k</b> <span class="point">.</span> <b>by_k</b> <span class="i">orderby_list</span>
+
+    by_k  <a href="#state_141">shift, and go to state 141</a>
+</p>
+
+<h3><a name="state_101" id="state_101"></a>state 101</h3>
+
+<p class="pre">  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <b>delete_k</b> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="point">.</span> <span class="i">limit_stmt</span>
+  <a href="#rule_94"> 94</a> <span class="i">limit_stmt</span> → <span class="point">.</span> <b>limit_k</b> <b>number</b>
+  <a href="#rule_95"> 95</a>            | <span class="point">.</span> %empty  [';']
+
+    limit_k  <a href="#state_142">shift, and go to state 142</a>
+
+    $default  <a href="#rule_95">reduce using rule 95</a> (limit_stmt)
+
+    limit_stmt  <a href="#state_143">go to state 143</a>
+</p>
+
+<h3><a name="state_102" id="state_102"></a>state 102</h3>
+
+<p class="pre">  <a href="#rule_16"> 16</a> <span class="i">type_drop</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_16">reduce using rule 16</a> (type_drop)
+</p>
+
+<h3><a name="state_103" id="state_103"></a>state 103</h3>
+
+<p class="pre">  <a href="#rule_27"> 27</a> <span class="i">constraints</span> → <b>primary_k</b> <span class="point">.</span> <b>key_k</b> <span class="i">col_list_chk</span>
+
+    key_k  <a href="#state_144">shift, and go to state 144</a>
+</p>
+
+<h3><a name="state_104" id="state_104"></a>state 104</h3>
+
+<p class="pre">  <a href="#rule_28"> 28</a> <span class="i">constraints</span> → <b>index_k</b> <span class="point">.</span> <span class="i">col_list_chk</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [';', ')', ',']
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_145">go to state 145</a>
+</p>
+
+<h3><a name="state_105" id="state_105"></a>state 105</h3>
+
+<p class="pre">  <a href="#rule_29"> 29</a> <span class="i">constraints</span> → <b>unique_k</b> <span class="point">.</span> <span class="i">col_list_chk</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [';', ')', ',']
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_146">go to state 146</a>
+</p>
+
+<h3><a name="state_106" id="state_106"></a>state 106</h3>
+
+<p class="pre">  <a href="#rule_30"> 30</a> <span class="i">constraints</span> → <b>foreign_k</b> <span class="point">.</span> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+
+    key_k  <a href="#state_147">shift, and go to state 147</a>
+</p>
+
+<h3><a name="state_107" id="state_107"></a>state 107</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <b>name</b> <span class="point">.</span> <span class="i">data_type</span> <span class="i">special_list1</span>
+  <a href="#rule_32"> 32</a> <span class="i">data_type</span> → <span class="point">.</span> <b>datatype_k</b>
+  <a href="#rule_33"> 33</a>           | <span class="point">.</span> <b>datatype_k</b> <b>'('</b> <b>number</b> <b>')'</b>
+
+    datatype_k  <a href="#state_148">shift, and go to state 148</a>
+
+    data_type  <a href="#state_149">go to state 149</a>
+</p>
+
+<h3><a name="state_108" id="state_108"></a>state 108</h3>
+
+<p class="pre">  <a href="#rule_20"> 20</a> <span class="i">type_create</span> → <b>table_k</b> <b>name</b> <b>'('</b> <span class="i">create_def_list</span> <span class="point">.</span> <b>')'</b>
+  <a href="#rule_24"> 24</a> <span class="i">create_def_list</span> → <span class="i">create_def_list</span> <span class="point">.</span> <b>','</b> <span class="i">create_def</span>
+
+    ')'  <a href="#state_150">shift, and go to state 150</a>
+    ','  <a href="#state_151">shift, and go to state 151</a>
+</p>
+
+<h3><a name="state_109" id="state_109"></a>state 109</h3>
+
+<p class="pre">  <a href="#rule_23"> 23</a> <span class="i">create_def_list</span> → <span class="i">create_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_23">reduce using rule 23</a> (create_def_list)
+</p>
+
+<h3><a name="state_110" id="state_110"></a>state 110</h3>
+
+<p class="pre">  <a href="#rule_26"> 26</a> <span class="i">create_def</span> → <span class="i">constraints</span> <span class="point">.</span>
+
+    $default  <a href="#rule_26">reduce using rule 26</a> (create_def)
+</p>
+
+<h3><a name="state_111" id="state_111"></a>state 111</h3>
+
+<p class="pre">  <a href="#rule_25"> 25</a> <span class="i">create_def</span> → <span class="i">col_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_25">reduce using rule 25</a> (create_def)
+</p>
+
+<h3><a name="state_112" id="state_112"></a>state 112</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+
+    '('  <a href="#state_152">shift, and go to state 152</a>
+</p>
+
+<h3><a name="state_113" id="state_113"></a>state 113</h3>
+
+<p class="pre">  <a href="#rule_22"> 22</a> <span class="i">type_create</span> → <b>view_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>as_k</b> <span class="point">.</span> <span class="i">select_stmt</span>
+  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <span class="point">.</span> <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span>
+
+    select_k  <a href="#state_3">shift, and go to state 3</a>
+
+    select_stmt  <a href="#state_153">go to state 153</a>
+</p>
+
+<h3><a name="state_114" id="state_114"></a>state 114</h3>
+
+<p class="pre">  <a href="#rule_44"> 44</a> <span class="i">rename_list</span> → <b>name</b> <b>to_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_44">reduce using rule 44</a> (rename_list)
+</p>
+
+<h3><a name="state_115" id="state_115"></a>state 115</h3>
+
+<p class="pre">  <a href="#rule_45"> 45</a> <span class="i">rename_list</span> → <span class="i">rename_list</span> <b>','</b> <b>name</b> <span class="point">.</span> <b>to_k</b> <b>name</b>
+
+    to_k  <a href="#state_154">shift, and go to state 154</a>
+</p>
+
+<h3><a name="state_116" id="state_116"></a>state 116</h3>
+
+<p class="pre">  <a href="#rule_27"> 27</a> <span class="i">constraints</span> → <span class="point">.</span> <b>primary_k</b> <b>key_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_28"> 28</a>             | <span class="point">.</span> <b>index_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_29"> 29</a>             | <span class="point">.</span> <b>unique_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_30"> 30</a>             | <span class="point">.</span> <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+  <a href="#rule_104">104</a> <span class="i">alter_spec</span> → <b>add_k</b> <b>constraint_k</b> <span class="point">.</span> <span class="i">constraints</span>
+
+    primary_k  <a href="#state_103">shift, and go to state 103</a>
+    index_k    <a href="#state_104">shift, and go to state 104</a>
+    unique_k   <a href="#state_105">shift, and go to state 105</a>
+    foreign_k  <a href="#state_106">shift, and go to state 106</a>
+
+    constraints  <a href="#state_155">go to state 155</a>
+</p>
+
+<h3><a name="state_117" id="state_117"></a>state 117</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <span class="point">.</span> <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+  <a href="#rule_100">100</a> <span class="i">add_col_def</span> → <b>'('</b> <span class="point">.</span> <span class="i">col_def_list</span> <b>')'</b>
+  <a href="#rule_101">101</a> <span class="i">col_def_list</span> → <span class="point">.</span> <span class="i">col_def</span>
+  <a href="#rule_102">102</a>              | <span class="point">.</span> <span class="i">col_def_list</span> <b>','</b> <span class="i">col_def</span>
+
+    name  <a href="#state_107">shift, and go to state 107</a>
+
+    col_def       <a href="#state_156">go to state 156</a>
+    col_def_list  <a href="#state_157">go to state 157</a>
+</p>
+
+<h3><a name="state_118" id="state_118"></a>state 118</h3>
+
+<p class="pre">  <a href="#rule_99"> 99</a> <span class="i">add_col_def</span> → <span class="i">col_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_99">reduce using rule 99</a> (add_col_def)
+</p>
+
+<h3><a name="state_119" id="state_119"></a>state 119</h3>
+
+<p class="pre">  <a href="#rule_103">103</a> <span class="i">alter_spec</span> → <b>add_k</b> <span class="i">add_col_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_103">reduce using rule 103</a> (alter_spec)
+</p>
+
+<h3><a name="state_120" id="state_120"></a>state 120</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <span class="point">.</span> <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+  <a href="#rule_105">105</a> <span class="i">alter_spec</span> → <b>change_k</b> <b>name</b> <span class="point">.</span> <span class="i">col_def</span>
+
+    name  <a href="#state_107">shift, and go to state 107</a>
+
+    col_def  <a href="#state_158">go to state 158</a>
+</p>
+
+<h3><a name="state_121" id="state_121"></a>state 121</h3>
+
+<p class="pre">  <a href="#rule_98"> 98</a> <span class="i">alter_spec_list</span> → <span class="i">alter_spec_list</span> <b>','</b> <span class="point">.</span> <span class="i">alter_spec</span>
+  <a href="#rule_103">103</a> <span class="i">alter_spec</span> → <span class="point">.</span> <b>add_k</b> <span class="i">add_col_def</span>
+  <a href="#rule_104">104</a>            | <span class="point">.</span> <b>add_k</b> <b>constraint_k</b> <span class="i">constraints</span>
+  <a href="#rule_105">105</a>            | <span class="point">.</span> <b>change_k</b> <b>name</b> <span class="i">col_def</span>
+
+    add_k     <a href="#state_83">shift, and go to state 83</a>
+    change_k  <a href="#state_84">shift, and go to state 84</a>
+
+    alter_spec  <a href="#state_159">go to state 159</a>
+</p>
+
+<h3><a name="state_122" id="state_122"></a>state 122</h3>
+
+<p class="pre">  <a href="#rule_50"> 50</a> <span class="i">type_show</span> → <b>columns_k</b> <b>in_k</b> <b>name</b> <span class="i">opt_name</span> <span class="point">.</span>
+
+    $default  <a href="#rule_50">reduce using rule 50</a> (type_show)
+</p>
+
+<h3><a name="state_123" id="state_123"></a>state 123</h3>
+
+<p class="pre">  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <b>'('</b> <span class="i">name_list</span> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_54">reduce using rule 54</a> (col_list_chk)
+</p>
+
+<h3><a name="state_124" id="state_124"></a>state 124</h3>
+
+<p class="pre">  <a href="#rule_60"> 60</a> <span class="i">val_list1</span> → <b>'('</b> <span class="point">.</span> <span class="i">val_list</span> <b>')'</b>
+  <a href="#rule_61"> 61</a> <span class="i">val_list</span> → <span class="point">.</span> <span class="i">data</span>
+  <a href="#rule_62"> 62</a>          | <span class="point">.</span> <span class="i">val_list</span> <b>','</b> <span class="i">data</span>
+  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    val_list  <a href="#state_160">go to state 160</a>
+    data      <a href="#state_161">go to state 161</a>
+</p>
+
+<h3><a name="state_125" id="state_125"></a>state 125</h3>
+
+<p class="pre">  <a href="#rule_53"> 53</a> <span class="i">insert_stmt</span> → <b>insert_k</b> <b>into_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>values_k</b> <span class="i">val_set</span> <span class="point">.</span>  [';']
+  <a href="#rule_59"> 59</a> <span class="i">val_set</span> → <span class="i">val_set</span> <span class="point">.</span> <b>','</b> <span class="i">val_list1</span>
+
+    ','  <a href="#state_162">shift, and go to state 162</a>
+
+    $default  <a href="#rule_53">reduce using rule 53</a> (insert_stmt)
+</p>
+
+<h3><a name="state_126" id="state_126"></a>state 126</h3>
+
+<p class="pre">  <a href="#rule_58"> 58</a> <span class="i">val_set</span> → <span class="i">val_list1</span> <span class="point">.</span>
+
+    $default  <a href="#rule_58">reduce using rule 58</a> (val_set)
+</p>
+
+<h3><a name="state_127" id="state_127"></a>state 127</h3>
+
+<p class="pre">  <a href="#rule_64"> 64</a> <span class="i">data</span> → <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_64">reduce using rule 64</a> (data)
+</p>
+
+<h3><a name="state_128" id="state_128"></a>state 128</h3>
+
+<p class="pre">  <a href="#rule_65"> 65</a> <span class="i">data</span> → <b>number</b> <span class="point">.</span>  [where_k, order_k, and_k, or_k, limit_k, ';', ')', ',']
+  <a href="#rule_66"> 66</a>      | <b>number</b> <span class="point">.</span> <b>'.'</b> <b>number</b>
+
+    '.'  <a href="#state_163">shift, and go to state 163</a>
+
+    $default  <a href="#rule_65">reduce using rule 65</a> (data)
+</p>
+
+<h3><a name="state_129" id="state_129"></a>state 129</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <b>'\''</b> <span class="point">.</span> <b>name</b> <b>'\''</b>
+
+    name  <a href="#state_164">shift, and go to state 164</a>
+</p>
+
+<h3><a name="state_130" id="state_130"></a>state 130</h3>
+
+<p class="pre">  <a href="#rule_93"> 93</a> <span class="i">set_single</span> → <b>name</b> <b>'='</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_93">reduce using rule 93</a> (set_single)
+</p>
+
+<h3><a name="state_131" id="state_131"></a>state 131</h3>
+
+<p class="pre">  <a href="#rule_92"> 92</a> <span class="i">set_list</span> → <span class="i">set_list</span> <b>','</b> <span class="i">set_single</span> <span class="point">.</span>
+
+    $default  <a href="#rule_92">reduce using rule 92</a> (set_list)
+</p>
+
+<h3><a name="state_132" id="state_132"></a>state 132</h3>
+
+<p class="pre">  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="point">.</span> <span class="i">limit_stmt</span>
+  <a href="#rule_94"> 94</a> <span class="i">limit_stmt</span> → <span class="point">.</span> <b>limit_k</b> <b>number</b>
+  <a href="#rule_95"> 95</a>            | <span class="point">.</span> %empty  [';']
+
+    limit_k  <a href="#state_142">shift, and go to state 142</a>
+
+    $default  <a href="#rule_95">reduce using rule 95</a> (limit_stmt)
+
+    limit_stmt  <a href="#state_165">go to state 165</a>
+</p>
+
+<h3><a name="state_133" id="state_133"></a>state 133</h3>
+
+<p class="pre">  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="point">.</span> <span class="i">limit_stmt</span>
+  <a href="#rule_94"> 94</a> <span class="i">limit_stmt</span> → <span class="point">.</span> <b>limit_k</b> <b>number</b>
+  <a href="#rule_95"> 95</a>            | <span class="point">.</span> %empty  [';']
+
+    limit_k  <a href="#state_142">shift, and go to state 142</a>
+
+    $default  <a href="#rule_95">reduce using rule 95</a> (limit_stmt)
+
+    limit_stmt  <a href="#state_166">go to state 166</a>
+</p>
+
+<h3><a name="state_134" id="state_134"></a>state 134</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <b>name</b> <b>'='</b> <span class="point">.</span> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    data  <a href="#state_167">go to state 167</a>
+</p>
+
+<h3><a name="state_135" id="state_135"></a>state 135</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_79"> 79</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&lt;'</b> <span class="point">.</span> <span class="i">data</span>
+  <a href="#rule_81"> 81</a>          | <b>name</b> <b>'&lt;'</b> <span class="point">.</span> <b>'='</b> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+    '='     <a href="#state_168">shift, and go to state 168</a>
+
+    data  <a href="#state_169">go to state 169</a>
+</p>
+
+<h3><a name="state_136" id="state_136"></a>state 136</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_80"> 80</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&gt;'</b> <span class="point">.</span> <span class="i">data</span>
+  <a href="#rule_82"> 82</a>          | <b>name</b> <b>'&gt;'</b> <span class="point">.</span> <b>'='</b> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+    '='     <a href="#state_170">shift, and go to state 170</a>
+
+    data  <a href="#state_171">go to state 171</a>
+</p>
+
+<h3><a name="state_137" id="state_137"></a>state 137</h3>
+
+<p class="pre">  <a href="#rule_83"> 83</a> <span class="i">cond_exp</span> → <b>name</b> <b>'!'</b> <span class="point">.</span> <b>'='</b> <span class="i">data</span>
+
+    '='  <a href="#state_172">shift, and go to state 172</a>
+</p>
+
+<h3><a name="state_138" id="state_138"></a>state 138</h3>
+
+<p class="pre">  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="i">exp</span> <span class="point">.</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="i">exp</span> <span class="point">.</span> <b>or_k</b> <span class="i">exp</span>
+  <a href="#rule_76"> 76</a>     | <b>'('</b> <span class="i">exp</span> <span class="point">.</span> <b>')'</b>
+
+    and_k  <a href="#state_139">shift, and go to state 139</a>
+    or_k   <a href="#state_140">shift, and go to state 140</a>
+    ')'    <a href="#state_173">shift, and go to state 173</a>
+</p>
+
+<h3><a name="state_139" id="state_139"></a>state 139</h3>
+
+<p class="pre">  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="point">.</span> <span class="i">exp</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_74"> 74</a>     | <span class="i">exp</span> <b>and_k</b> <span class="point">.</span> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="point">.</span> <span class="i">exp</span> <b>or_k</b> <span class="i">exp</span>
+  <a href="#rule_76"> 76</a>     | <span class="point">.</span> <b>'('</b> <span class="i">exp</span> <b>')'</b>
+  <a href="#rule_77"> 77</a>     | <span class="point">.</span> <span class="i">cond_exp</span>
+  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <span class="point">.</span> <b>name</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_79"> 79</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <span class="i">data</span>
+  <a href="#rule_80"> 80</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <span class="i">data</span>
+  <a href="#rule_81"> 81</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_82"> 82</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_83"> 83</a>          | <span class="point">.</span> <b>name</b> <b>'!'</b> <b>'='</b> <span class="i">data</span>
+
+    name  <a href="#state_95">shift, and go to state 95</a>
+    '('   <a href="#state_96">shift, and go to state 96</a>
+
+    exp       <a href="#state_174">go to state 174</a>
+    cond_exp  <a href="#state_99">go to state 99</a>
+</p>
+
+<h3><a name="state_140" id="state_140"></a>state 140</h3>
+
+<p class="pre">  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="point">.</span> <span class="i">exp</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="point">.</span> <span class="i">exp</span> <b>or_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="i">exp</span> <b>or_k</b> <span class="point">.</span> <span class="i">exp</span>
+  <a href="#rule_76"> 76</a>     | <span class="point">.</span> <b>'('</b> <span class="i">exp</span> <b>')'</b>
+  <a href="#rule_77"> 77</a>     | <span class="point">.</span> <span class="i">cond_exp</span>
+  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <span class="point">.</span> <b>name</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_79"> 79</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <span class="i">data</span>
+  <a href="#rule_80"> 80</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <span class="i">data</span>
+  <a href="#rule_81"> 81</a>          | <span class="point">.</span> <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_82"> 82</a>          | <span class="point">.</span> <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span>
+  <a href="#rule_83"> 83</a>          | <span class="point">.</span> <b>name</b> <b>'!'</b> <b>'='</b> <span class="i">data</span>
+
+    name  <a href="#state_95">shift, and go to state 95</a>
+    '('   <a href="#state_96">shift, and go to state 96</a>
+
+    exp       <a href="#state_175">go to state 175</a>
+    cond_exp  <a href="#state_99">go to state 99</a>
+</p>
+
+<h3><a name="state_141" id="state_141"></a>state 141</h3>
+
+<p class="pre">  <a href="#rule_84"> 84</a> <span class="i">orderby_stmt</span> → <b>order_k</b> <b>by_k</b> <span class="point">.</span> <span class="i">orderby_list</span>
+  <a href="#rule_86"> 86</a> <span class="i">orderby_list</span> → <span class="point">.</span> <b>name</b> <span class="i">order_type</span>
+  <a href="#rule_87"> 87</a>              | <span class="point">.</span> <span class="i">orderby_list</span> <b>','</b> <b>name</b> <span class="i">order_type</span>
+
+    name  <a href="#state_176">shift, and go to state 176</a>
+
+    orderby_list  <a href="#state_177">go to state 177</a>
+</p>
+
+<h3><a name="state_142" id="state_142"></a>state 142</h3>
+
+<p class="pre">  <a href="#rule_94"> 94</a> <span class="i">limit_stmt</span> → <b>limit_k</b> <span class="point">.</span> <b>number</b>
+
+    number  <a href="#state_178">shift, and go to state 178</a>
+</p>
+
+<h3><a name="state_143" id="state_143"></a>state 143</h3>
+
+<p class="pre">  <a href="#rule_67"> 67</a> <span class="i">delete_stmt</span> → <b>delete_k</b> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_67">reduce using rule 67</a> (delete_stmt)
+</p>
+
+<h3><a name="state_144" id="state_144"></a>state 144</h3>
+
+<p class="pre">  <a href="#rule_27"> 27</a> <span class="i">constraints</span> → <b>primary_k</b> <b>key_k</b> <span class="point">.</span> <span class="i">col_list_chk</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [';', ')', ',']
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_179">go to state 179</a>
+</p>
+
+<h3><a name="state_145" id="state_145"></a>state 145</h3>
+
+<p class="pre">  <a href="#rule_28"> 28</a> <span class="i">constraints</span> → <b>index_k</b> <span class="i">col_list_chk</span> <span class="point">.</span>
+
+    $default  <a href="#rule_28">reduce using rule 28</a> (constraints)
+</p>
+
+<h3><a name="state_146" id="state_146"></a>state 146</h3>
+
+<p class="pre">  <a href="#rule_29"> 29</a> <span class="i">constraints</span> → <b>unique_k</b> <span class="i">col_list_chk</span> <span class="point">.</span>
+
+    $default  <a href="#rule_29">reduce using rule 29</a> (constraints)
+</p>
+
+<h3><a name="state_147" id="state_147"></a>state 147</h3>
+
+<p class="pre">  <a href="#rule_30"> 30</a> <span class="i">constraints</span> → <b>foreign_k</b> <b>key_k</b> <span class="point">.</span> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [references_k]
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_180">go to state 180</a>
+</p>
+
+<h3><a name="state_148" id="state_148"></a>state 148</h3>
+
+<p class="pre">  <a href="#rule_32"> 32</a> <span class="i">data_type</span> → <b>datatype_k</b> <span class="point">.</span>  [not_k, primary_k, auto_k, unique_k, references_k, ';', ')', ',']
+  <a href="#rule_33"> 33</a>           | <b>datatype_k</b> <span class="point">.</span> <b>'('</b> <b>number</b> <b>')'</b>
+
+    '('  <a href="#state_181">shift, and go to state 181</a>
+
+    $default  <a href="#rule_32">reduce using rule 32</a> (data_type)
+</p>
+
+<h3><a name="state_149" id="state_149"></a>state 149</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <b>name</b> <span class="i">data_type</span> <span class="point">.</span> <span class="i">special_list1</span>
+  <a href="#rule_34"> 34</a> <span class="i">special_list1</span> → <span class="point">.</span> <span class="i">special_list</span>
+  <a href="#rule_35"> 35</a>               | <span class="point">.</span> %empty  [';', ')', ',']
+  <a href="#rule_36"> 36</a> <span class="i">special_list</span> → <span class="point">.</span> <span class="i">special_ele</span>
+  <a href="#rule_37"> 37</a>              | <span class="point">.</span> <span class="i">special_list</span> <span class="i">special_ele</span>
+  <a href="#rule_38"> 38</a> <span class="i">special_ele</span> → <span class="point">.</span> <b>not_k</b> <b>null_k</b>
+  <a href="#rule_39"> 39</a>             | <span class="point">.</span> <b>auto_k</b>
+  <a href="#rule_40"> 40</a>             | <span class="point">.</span> <b>primary_k</b> <b>key_k</b>
+  <a href="#rule_41"> 41</a>             | <span class="point">.</span> <b>unique_k</b>
+  <a href="#rule_42"> 42</a>             | <span class="point">.</span> <b>references_k</b> <b>name</b> <b>name</b>
+
+    not_k         <a href="#state_182">shift, and go to state 182</a>
+    primary_k     <a href="#state_183">shift, and go to state 183</a>
+    auto_k        <a href="#state_184">shift, and go to state 184</a>
+    unique_k      <a href="#state_185">shift, and go to state 185</a>
+    references_k  <a href="#state_186">shift, and go to state 186</a>
+
+    $default  <a href="#rule_35">reduce using rule 35</a> (special_list1)
+
+    special_list1  <a href="#state_187">go to state 187</a>
+    special_list   <a href="#state_188">go to state 188</a>
+    special_ele    <a href="#state_189">go to state 189</a>
+</p>
+
+<h3><a name="state_150" id="state_150"></a>state 150</h3>
+
+<p class="pre">  <a href="#rule_20"> 20</a> <span class="i">type_create</span> → <b>table_k</b> <b>name</b> <b>'('</b> <span class="i">create_def_list</span> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_20">reduce using rule 20</a> (type_create)
+</p>
+
+<h3><a name="state_151" id="state_151"></a>state 151</h3>
+
+<p class="pre">  <a href="#rule_24"> 24</a> <span class="i">create_def_list</span> → <span class="i">create_def_list</span> <b>','</b> <span class="point">.</span> <span class="i">create_def</span>
+  <a href="#rule_25"> 25</a> <span class="i">create_def</span> → <span class="point">.</span> <span class="i">col_def</span>
+  <a href="#rule_26"> 26</a>            | <span class="point">.</span> <span class="i">constraints</span>
+  <a href="#rule_27"> 27</a> <span class="i">constraints</span> → <span class="point">.</span> <b>primary_k</b> <b>key_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_28"> 28</a>             | <span class="point">.</span> <b>index_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_29"> 29</a>             | <span class="point">.</span> <b>unique_k</b> <span class="i">col_list_chk</span>
+  <a href="#rule_30"> 30</a>             | <span class="point">.</span> <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <span class="point">.</span> <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+
+    primary_k  <a href="#state_103">shift, and go to state 103</a>
+    index_k    <a href="#state_104">shift, and go to state 104</a>
+    unique_k   <a href="#state_105">shift, and go to state 105</a>
+    foreign_k  <a href="#state_106">shift, and go to state 106</a>
+    name       <a href="#state_107">shift, and go to state 107</a>
+
+    create_def   <a href="#state_190">go to state 190</a>
+    constraints  <a href="#state_110">go to state 110</a>
+    col_def      <a href="#state_111">go to state 111</a>
+</p>
+
+<h3><a name="state_152" id="state_152"></a>state 152</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <b>'('</b> <span class="point">.</span> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_56"> 56</a> <span class="i">name_list</span> → <span class="point">.</span> <b>name</b>
+  <a href="#rule_57"> 57</a>           | <span class="point">.</span> <span class="i">name_list</span> <b>','</b> <b>name</b>
+
+    name  <a href="#state_25">shift, and go to state 25</a>
+
+    name_list  <a href="#state_191">go to state 191</a>
+</p>
+
+<h3><a name="state_153" id="state_153"></a>state 153</h3>
+
+<p class="pre">  <a href="#rule_22"> 22</a> <span class="i">type_create</span> → <b>view_k</b> <b>name</b> <span class="i">col_list_chk</span> <b>as_k</b> <span class="i">select_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_22">reduce using rule 22</a> (type_create)
+</p>
+
+<h3><a name="state_154" id="state_154"></a>state 154</h3>
+
+<p class="pre">  <a href="#rule_45"> 45</a> <span class="i">rename_list</span> → <span class="i">rename_list</span> <b>','</b> <b>name</b> <b>to_k</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_192">shift, and go to state 192</a>
+</p>
+
+<h3><a name="state_155" id="state_155"></a>state 155</h3>
+
+<p class="pre">  <a href="#rule_104">104</a> <span class="i">alter_spec</span> → <b>add_k</b> <b>constraint_k</b> <span class="i">constraints</span> <span class="point">.</span>
+
+    $default  <a href="#rule_104">reduce using rule 104</a> (alter_spec)
+</p>
+
+<h3><a name="state_156" id="state_156"></a>state 156</h3>
+
+<p class="pre">  <a href="#rule_101">101</a> <span class="i">col_def_list</span> → <span class="i">col_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_101">reduce using rule 101</a> (col_def_list)
+</p>
+
+<h3><a name="state_157" id="state_157"></a>state 157</h3>
+
+<p class="pre">  <a href="#rule_100">100</a> <span class="i">add_col_def</span> → <b>'('</b> <span class="i">col_def_list</span> <span class="point">.</span> <b>')'</b>
+  <a href="#rule_102">102</a> <span class="i">col_def_list</span> → <span class="i">col_def_list</span> <span class="point">.</span> <b>','</b> <span class="i">col_def</span>
+
+    ')'  <a href="#state_193">shift, and go to state 193</a>
+    ','  <a href="#state_194">shift, and go to state 194</a>
+</p>
+
+<h3><a name="state_158" id="state_158"></a>state 158</h3>
+
+<p class="pre">  <a href="#rule_105">105</a> <span class="i">alter_spec</span> → <b>change_k</b> <b>name</b> <span class="i">col_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_105">reduce using rule 105</a> (alter_spec)
+</p>
+
+<h3><a name="state_159" id="state_159"></a>state 159</h3>
+
+<p class="pre">  <a href="#rule_98"> 98</a> <span class="i">alter_spec_list</span> → <span class="i">alter_spec_list</span> <b>','</b> <span class="i">alter_spec</span> <span class="point">.</span>
+
+    $default  <a href="#rule_98">reduce using rule 98</a> (alter_spec_list)
+</p>
+
+<h3><a name="state_160" id="state_160"></a>state 160</h3>
+
+<p class="pre">  <a href="#rule_60"> 60</a> <span class="i">val_list1</span> → <b>'('</b> <span class="i">val_list</span> <span class="point">.</span> <b>')'</b>
+  <a href="#rule_62"> 62</a> <span class="i">val_list</span> → <span class="i">val_list</span> <span class="point">.</span> <b>','</b> <span class="i">data</span>
+
+    ')'  <a href="#state_195">shift, and go to state 195</a>
+    ','  <a href="#state_196">shift, and go to state 196</a>
+</p>
+
+<h3><a name="state_161" id="state_161"></a>state 161</h3>
+
+<p class="pre">  <a href="#rule_61"> 61</a> <span class="i">val_list</span> → <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_61">reduce using rule 61</a> (val_list)
+</p>
+
+<h3><a name="state_162" id="state_162"></a>state 162</h3>
+
+<p class="pre">  <a href="#rule_59"> 59</a> <span class="i">val_set</span> → <span class="i">val_set</span> <b>','</b> <span class="point">.</span> <span class="i">val_list1</span>
+  <a href="#rule_60"> 60</a> <span class="i">val_list1</span> → <span class="point">.</span> <b>'('</b> <span class="i">val_list</span> <b>')'</b>
+
+    '('  <a href="#state_124">shift, and go to state 124</a>
+
+    val_list1  <a href="#state_197">go to state 197</a>
+</p>
+
+<h3><a name="state_163" id="state_163"></a>state 163</h3>
+
+<p class="pre">  <a href="#rule_66"> 66</a> <span class="i">data</span> → <b>number</b> <b>'.'</b> <span class="point">.</span> <b>number</b>
+
+    number  <a href="#state_198">shift, and go to state 198</a>
+</p>
+
+<h3><a name="state_164" id="state_164"></a>state 164</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <b>'\''</b> <b>name</b> <span class="point">.</span> <b>'\''</b>
+
+    '\''  <a href="#state_199">shift, and go to state 199</a>
+</p>
+
+<h3><a name="state_165" id="state_165"></a>state 165</h3>
+
+<p class="pre">  <a href="#rule_90"> 90</a> <span class="i">update_stmt</span> → <b>update_k</b> <b>name</b> <b>set_k</b> <span class="i">set_list</span> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_90">reduce using rule 90</a> (update_stmt)
+</p>
+
+<h3><a name="state_166" id="state_166"></a>state 166</h3>
+
+<p class="pre">  <a href="#rule_68"> 68</a> <span class="i">select_stmt</span> → <b>select_k</b> <span class="i">select_col_chk</span> <b>from_k</b> <b>name</b> <span class="i">where_stmt</span> <span class="i">orderby_stmt</span> <span class="i">limit_stmt</span> <span class="point">.</span>
+
+    $default  <a href="#rule_68">reduce using rule 68</a> (select_stmt)
+</p>
+
+<h3><a name="state_167" id="state_167"></a>state 167</h3>
+
+<p class="pre">  <a href="#rule_78"> 78</a> <span class="i">cond_exp</span> → <b>name</b> <b>'='</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_78">reduce using rule 78</a> (cond_exp)
+</p>
+
+<h3><a name="state_168" id="state_168"></a>state 168</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_81"> 81</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="point">.</span> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    data  <a href="#state_200">go to state 200</a>
+</p>
+
+<h3><a name="state_169" id="state_169"></a>state 169</h3>
+
+<p class="pre">  <a href="#rule_79"> 79</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&lt;'</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_79">reduce using rule 79</a> (cond_exp)
+</p>
+
+<h3><a name="state_170" id="state_170"></a>state 170</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_82"> 82</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="point">.</span> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    data  <a href="#state_201">go to state 201</a>
+</p>
+
+<h3><a name="state_171" id="state_171"></a>state 171</h3>
+
+<p class="pre">  <a href="#rule_80"> 80</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&gt;'</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_80">reduce using rule 80</a> (cond_exp)
+</p>
+
+<h3><a name="state_172" id="state_172"></a>state 172</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+  <a href="#rule_83"> 83</a> <span class="i">cond_exp</span> → <b>name</b> <b>'!'</b> <b>'='</b> <span class="point">.</span> <span class="i">data</span>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    data  <a href="#state_202">go to state 202</a>
+</p>
+
+<h3><a name="state_173" id="state_173"></a>state 173</h3>
+
+<p class="pre">  <a href="#rule_76"> 76</a> <span class="i">exp</span> → <b>'('</b> <span class="i">exp</span> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_76">reduce using rule 76</a> (exp)
+</p>
+
+<h3><a name="state_174" id="state_174"></a>state 174</h3>
+
+<p class="pre">  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="i">exp</span> <span class="point">.</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_74"> 74</a>     | <span class="i">exp</span> <b>and_k</b> <span class="i">exp</span> <span class="point">.</span>  [order_k, and_k, limit_k, ';', ')']
+  <a href="#rule_75"> 75</a>     | <span class="i">exp</span> <span class="point">.</span> <b>or_k</b> <span class="i">exp</span>
+
+    or_k  <a href="#state_140">shift, and go to state 140</a>
+
+    $default  <a href="#rule_74">reduce using rule 74</a> (exp)
+
+    Conflict between <a href="#rule_74">rule 74</a> and token and_k resolved as reduce (%left and_k).
+    Conflict between <a href="#rule_74">rule 74</a> and token or_k resolved as shift (and_k &lt; or_k).
+</p>
+
+<h3><a name="state_175" id="state_175"></a>state 175</h3>
+
+<p class="pre">  <a href="#rule_74"> 74</a> <span class="i">exp</span> → <span class="i">exp</span> <span class="point">.</span> <b>and_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="i">exp</span> <span class="point">.</span> <b>or_k</b> <span class="i">exp</span>
+  <a href="#rule_75"> 75</a>     | <span class="i">exp</span> <b>or_k</b> <span class="i">exp</span> <span class="point">.</span>  [order_k, and_k, or_k, limit_k, ';', ')']
+
+    $default  <a href="#rule_75">reduce using rule 75</a> (exp)
+
+    Conflict between <a href="#rule_75">rule 75</a> and token and_k resolved as reduce (and_k &lt; or_k).
+    Conflict between <a href="#rule_75">rule 75</a> and token or_k resolved as reduce (%left or_k).
+</p>
+
+<h3><a name="state_176" id="state_176"></a>state 176</h3>
+
+<p class="pre">  <a href="#rule_86"> 86</a> <span class="i">orderby_list</span> → <b>name</b> <span class="point">.</span> <span class="i">order_type</span>
+  <a href="#rule_88"> 88</a> <span class="i">order_type</span> → <span class="point">.</span> <b>asc_k</b>
+  <a href="#rule_89"> 89</a>            | <span class="point">.</span> <b>dec_k</b>
+
+    asc_k  <a href="#state_203">shift, and go to state 203</a>
+    dec_k  <a href="#state_204">shift, and go to state 204</a>
+
+    order_type  <a href="#state_205">go to state 205</a>
+</p>
+
+<h3><a name="state_177" id="state_177"></a>state 177</h3>
+
+<p class="pre">  <a href="#rule_84"> 84</a> <span class="i">orderby_stmt</span> → <b>order_k</b> <b>by_k</b> <span class="i">orderby_list</span> <span class="point">.</span>  [limit_k, ';']
+  <a href="#rule_87"> 87</a> <span class="i">orderby_list</span> → <span class="i">orderby_list</span> <span class="point">.</span> <b>','</b> <b>name</b> <span class="i">order_type</span>
+
+    ','  <a href="#state_206">shift, and go to state 206</a>
+
+    $default  <a href="#rule_84">reduce using rule 84</a> (orderby_stmt)
+</p>
+
+<h3><a name="state_178" id="state_178"></a>state 178</h3>
+
+<p class="pre">  <a href="#rule_94"> 94</a> <span class="i">limit_stmt</span> → <b>limit_k</b> <b>number</b> <span class="point">.</span>
+
+    $default  <a href="#rule_94">reduce using rule 94</a> (limit_stmt)
+</p>
+
+<h3><a name="state_179" id="state_179"></a>state 179</h3>
+
+<p class="pre">  <a href="#rule_27"> 27</a> <span class="i">constraints</span> → <b>primary_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <span class="point">.</span>
+
+    $default  <a href="#rule_27">reduce using rule 27</a> (constraints)
+</p>
+
+<h3><a name="state_180" id="state_180"></a>state 180</h3>
+
+<p class="pre">  <a href="#rule_30"> 30</a> <span class="i">constraints</span> → <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <span class="point">.</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span>
+
+    references_k  <a href="#state_207">shift, and go to state 207</a>
+</p>
+
+<h3><a name="state_181" id="state_181"></a>state 181</h3>
+
+<p class="pre">  <a href="#rule_33"> 33</a> <span class="i">data_type</span> → <b>datatype_k</b> <b>'('</b> <span class="point">.</span> <b>number</b> <b>')'</b>
+
+    number  <a href="#state_208">shift, and go to state 208</a>
+</p>
+
+<h3><a name="state_182" id="state_182"></a>state 182</h3>
+
+<p class="pre">  <a href="#rule_38"> 38</a> <span class="i">special_ele</span> → <b>not_k</b> <span class="point">.</span> <b>null_k</b>
+
+    null_k  <a href="#state_209">shift, and go to state 209</a>
+</p>
+
+<h3><a name="state_183" id="state_183"></a>state 183</h3>
+
+<p class="pre">  <a href="#rule_40"> 40</a> <span class="i">special_ele</span> → <b>primary_k</b> <span class="point">.</span> <b>key_k</b>
+
+    key_k  <a href="#state_210">shift, and go to state 210</a>
+</p>
+
+<h3><a name="state_184" id="state_184"></a>state 184</h3>
+
+<p class="pre">  <a href="#rule_39"> 39</a> <span class="i">special_ele</span> → <b>auto_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_39">reduce using rule 39</a> (special_ele)
+</p>
+
+<h3><a name="state_185" id="state_185"></a>state 185</h3>
+
+<p class="pre">  <a href="#rule_41"> 41</a> <span class="i">special_ele</span> → <b>unique_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_41">reduce using rule 41</a> (special_ele)
+</p>
+
+<h3><a name="state_186" id="state_186"></a>state 186</h3>
+
+<p class="pre">  <a href="#rule_42"> 42</a> <span class="i">special_ele</span> → <b>references_k</b> <span class="point">.</span> <b>name</b> <b>name</b>
+
+    name  <a href="#state_211">shift, and go to state 211</a>
+</p>
+
+<h3><a name="state_187" id="state_187"></a>state 187</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span> <span class="point">.</span>
+
+    $default  <a href="#rule_31">reduce using rule 31</a> (col_def)
+</p>
+
+<h3><a name="state_188" id="state_188"></a>state 188</h3>
+
+<p class="pre">  <a href="#rule_34"> 34</a> <span class="i">special_list1</span> → <span class="i">special_list</span> <span class="point">.</span>  [';', ')', ',']
+  <a href="#rule_37"> 37</a> <span class="i">special_list</span> → <span class="i">special_list</span> <span class="point">.</span> <span class="i">special_ele</span>
+  <a href="#rule_38"> 38</a> <span class="i">special_ele</span> → <span class="point">.</span> <b>not_k</b> <b>null_k</b>
+  <a href="#rule_39"> 39</a>             | <span class="point">.</span> <b>auto_k</b>
+  <a href="#rule_40"> 40</a>             | <span class="point">.</span> <b>primary_k</b> <b>key_k</b>
+  <a href="#rule_41"> 41</a>             | <span class="point">.</span> <b>unique_k</b>
+  <a href="#rule_42"> 42</a>             | <span class="point">.</span> <b>references_k</b> <b>name</b> <b>name</b>
+
+    not_k         <a href="#state_182">shift, and go to state 182</a>
+    primary_k     <a href="#state_183">shift, and go to state 183</a>
+    auto_k        <a href="#state_184">shift, and go to state 184</a>
+    unique_k      <a href="#state_185">shift, and go to state 185</a>
+    references_k  <a href="#state_186">shift, and go to state 186</a>
+
+    $default  <a href="#rule_34">reduce using rule 34</a> (special_list1)
+
+    special_ele  <a href="#state_212">go to state 212</a>
+</p>
+
+<h3><a name="state_189" id="state_189"></a>state 189</h3>
+
+<p class="pre">  <a href="#rule_36"> 36</a> <span class="i">special_list</span> → <span class="i">special_ele</span> <span class="point">.</span>
+
+    $default  <a href="#rule_36">reduce using rule 36</a> (special_list)
+</p>
+
+<h3><a name="state_190" id="state_190"></a>state 190</h3>
+
+<p class="pre">  <a href="#rule_24"> 24</a> <span class="i">create_def_list</span> → <span class="i">create_def_list</span> <b>','</b> <span class="i">create_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_24">reduce using rule 24</a> (create_def_list)
+</p>
+
+<h3><a name="state_191" id="state_191"></a>state 191</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <b>'('</b> <span class="i">name_list</span> <span class="point">.</span> <b>')'</b>
+  <a href="#rule_57"> 57</a> <span class="i">name_list</span> → <span class="i">name_list</span> <span class="point">.</span> <b>','</b> <b>name</b>
+
+    ')'  <a href="#state_213">shift, and go to state 213</a>
+    ','  <a href="#state_51">shift, and go to state 51</a>
+</p>
+
+<h3><a name="state_192" id="state_192"></a>state 192</h3>
+
+<p class="pre">  <a href="#rule_45"> 45</a> <span class="i">rename_list</span> → <span class="i">rename_list</span> <b>','</b> <b>name</b> <b>to_k</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_45">reduce using rule 45</a> (rename_list)
+</p>
+
+<h3><a name="state_193" id="state_193"></a>state 193</h3>
+
+<p class="pre">  <a href="#rule_100">100</a> <span class="i">add_col_def</span> → <b>'('</b> <span class="i">col_def_list</span> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_100">reduce using rule 100</a> (add_col_def)
+</p>
+
+<h3><a name="state_194" id="state_194"></a>state 194</h3>
+
+<p class="pre">  <a href="#rule_31"> 31</a> <span class="i">col_def</span> → <span class="point">.</span> <b>name</b> <span class="i">data_type</span> <span class="i">special_list1</span>
+  <a href="#rule_102">102</a> <span class="i">col_def_list</span> → <span class="i">col_def_list</span> <b>','</b> <span class="point">.</span> <span class="i">col_def</span>
+
+    name  <a href="#state_107">shift, and go to state 107</a>
+
+    col_def  <a href="#state_214">go to state 214</a>
+</p>
+
+<h3><a name="state_195" id="state_195"></a>state 195</h3>
+
+<p class="pre">  <a href="#rule_60"> 60</a> <span class="i">val_list1</span> → <b>'('</b> <span class="i">val_list</span> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_60">reduce using rule 60</a> (val_list1)
+</p>
+
+<h3><a name="state_196" id="state_196"></a>state 196</h3>
+
+<p class="pre">  <a href="#rule_62"> 62</a> <span class="i">val_list</span> → <span class="i">val_list</span> <b>','</b> <span class="point">.</span> <span class="i">data</span>
+  <a href="#rule_63"> 63</a> <span class="i">data</span> → <span class="point">.</span> <b>'\''</b> <b>name</b> <b>'\''</b>
+  <a href="#rule_64"> 64</a>      | <span class="point">.</span> <b>name</b>
+  <a href="#rule_65"> 65</a>      | <span class="point">.</span> <b>number</b>
+  <a href="#rule_66"> 66</a>      | <span class="point">.</span> <b>number</b> <b>'.'</b> <b>number</b>
+
+    name    <a href="#state_127">shift, and go to state 127</a>
+    number  <a href="#state_128">shift, and go to state 128</a>
+    '\''    <a href="#state_129">shift, and go to state 129</a>
+
+    data  <a href="#state_215">go to state 215</a>
+</p>
+
+<h3><a name="state_197" id="state_197"></a>state 197</h3>
+
+<p class="pre">  <a href="#rule_59"> 59</a> <span class="i">val_set</span> → <span class="i">val_set</span> <b>','</b> <span class="i">val_list1</span> <span class="point">.</span>
+
+    $default  <a href="#rule_59">reduce using rule 59</a> (val_set)
+</p>
+
+<h3><a name="state_198" id="state_198"></a>state 198</h3>
+
+<p class="pre">  <a href="#rule_66"> 66</a> <span class="i">data</span> → <b>number</b> <b>'.'</b> <b>number</b> <span class="point">.</span>
+
+    $default  <a href="#rule_66">reduce using rule 66</a> (data)
+</p>
+
+<h3><a name="state_199" id="state_199"></a>state 199</h3>
+
+<p class="pre">  <a href="#rule_63"> 63</a> <span class="i">data</span> → <b>'\''</b> <b>name</b> <b>'\''</b> <span class="point">.</span>
+
+    $default  <a href="#rule_63">reduce using rule 63</a> (data)
+</p>
+
+<h3><a name="state_200" id="state_200"></a>state 200</h3>
+
+<p class="pre">  <a href="#rule_81"> 81</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&lt;'</b> <b>'='</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_81">reduce using rule 81</a> (cond_exp)
+</p>
+
+<h3><a name="state_201" id="state_201"></a>state 201</h3>
+
+<p class="pre">  <a href="#rule_82"> 82</a> <span class="i">cond_exp</span> → <b>name</b> <b>'&gt;'</b> <b>'='</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_82">reduce using rule 82</a> (cond_exp)
+</p>
+
+<h3><a name="state_202" id="state_202"></a>state 202</h3>
+
+<p class="pre">  <a href="#rule_83"> 83</a> <span class="i">cond_exp</span> → <b>name</b> <b>'!'</b> <b>'='</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_83">reduce using rule 83</a> (cond_exp)
+</p>
+
+<h3><a name="state_203" id="state_203"></a>state 203</h3>
+
+<p class="pre">  <a href="#rule_88"> 88</a> <span class="i">order_type</span> → <b>asc_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_88">reduce using rule 88</a> (order_type)
+</p>
+
+<h3><a name="state_204" id="state_204"></a>state 204</h3>
+
+<p class="pre">  <a href="#rule_89"> 89</a> <span class="i">order_type</span> → <b>dec_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_89">reduce using rule 89</a> (order_type)
+</p>
+
+<h3><a name="state_205" id="state_205"></a>state 205</h3>
+
+<p class="pre">  <a href="#rule_86"> 86</a> <span class="i">orderby_list</span> → <b>name</b> <span class="i">order_type</span> <span class="point">.</span>
+
+    $default  <a href="#rule_86">reduce using rule 86</a> (orderby_list)
+</p>
+
+<h3><a name="state_206" id="state_206"></a>state 206</h3>
+
+<p class="pre">  <a href="#rule_87"> 87</a> <span class="i">orderby_list</span> → <span class="i">orderby_list</span> <b>','</b> <span class="point">.</span> <b>name</b> <span class="i">order_type</span>
+
+    name  <a href="#state_216">shift, and go to state 216</a>
+</p>
+
+<h3><a name="state_207" id="state_207"></a>state 207</h3>
+
+<p class="pre">  <a href="#rule_30"> 30</a> <span class="i">constraints</span> → <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <span class="point">.</span> <b>name</b> <span class="i">col_list_chk</span>
+
+    name  <a href="#state_217">shift, and go to state 217</a>
+</p>
+
+<h3><a name="state_208" id="state_208"></a>state 208</h3>
+
+<p class="pre">  <a href="#rule_33"> 33</a> <span class="i">data_type</span> → <b>datatype_k</b> <b>'('</b> <b>number</b> <span class="point">.</span> <b>')'</b>
+
+    ')'  <a href="#state_218">shift, and go to state 218</a>
+</p>
+
+<h3><a name="state_209" id="state_209"></a>state 209</h3>
+
+<p class="pre">  <a href="#rule_38"> 38</a> <span class="i">special_ele</span> → <b>not_k</b> <b>null_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_38">reduce using rule 38</a> (special_ele)
+</p>
+
+<h3><a name="state_210" id="state_210"></a>state 210</h3>
+
+<p class="pre">  <a href="#rule_40"> 40</a> <span class="i">special_ele</span> → <b>primary_k</b> <b>key_k</b> <span class="point">.</span>
+
+    $default  <a href="#rule_40">reduce using rule 40</a> (special_ele)
+</p>
+
+<h3><a name="state_211" id="state_211"></a>state 211</h3>
+
+<p class="pre">  <a href="#rule_42"> 42</a> <span class="i">special_ele</span> → <b>references_k</b> <b>name</b> <span class="point">.</span> <b>name</b>
+
+    name  <a href="#state_219">shift, and go to state 219</a>
+</p>
+
+<h3><a name="state_212" id="state_212"></a>state 212</h3>
+
+<p class="pre">  <a href="#rule_37"> 37</a> <span class="i">special_list</span> → <span class="i">special_list</span> <span class="i">special_ele</span> <span class="point">.</span>
+
+    $default  <a href="#rule_37">reduce using rule 37</a> (special_list)
+</p>
+
+<h3><a name="state_213" id="state_213"></a>state 213</h3>
+
+<p class="pre">  <a href="#rule_21"> 21</a> <span class="i">type_create</span> → <b>index_k</b> <b>name</b> <b>on_k</b> <b>name</b> <b>'('</b> <span class="i">name_list</span> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_21">reduce using rule 21</a> (type_create)
+</p>
+
+<h3><a name="state_214" id="state_214"></a>state 214</h3>
+
+<p class="pre">  <a href="#rule_102">102</a> <span class="i">col_def_list</span> → <span class="i">col_def_list</span> <b>','</b> <span class="i">col_def</span> <span class="point">.</span>
+
+    $default  <a href="#rule_102">reduce using rule 102</a> (col_def_list)
+</p>
+
+<h3><a name="state_215" id="state_215"></a>state 215</h3>
+
+<p class="pre">  <a href="#rule_62"> 62</a> <span class="i">val_list</span> → <span class="i">val_list</span> <b>','</b> <span class="i">data</span> <span class="point">.</span>
+
+    $default  <a href="#rule_62">reduce using rule 62</a> (val_list)
+</p>
+
+<h3><a name="state_216" id="state_216"></a>state 216</h3>
+
+<p class="pre">  <a href="#rule_87"> 87</a> <span class="i">orderby_list</span> → <span class="i">orderby_list</span> <b>','</b> <b>name</b> <span class="point">.</span> <span class="i">order_type</span>
+  <a href="#rule_88"> 88</a> <span class="i">order_type</span> → <span class="point">.</span> <b>asc_k</b>
+  <a href="#rule_89"> 89</a>            | <span class="point">.</span> <b>dec_k</b>
+
+    asc_k  <a href="#state_203">shift, and go to state 203</a>
+    dec_k  <a href="#state_204">shift, and go to state 204</a>
+
+    order_type  <a href="#state_220">go to state 220</a>
+</p>
+
+<h3><a name="state_217" id="state_217"></a>state 217</h3>
+
+<p class="pre">  <a href="#rule_30"> 30</a> <span class="i">constraints</span> → <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="point">.</span> <span class="i">col_list_chk</span>
+  <a href="#rule_54"> 54</a> <span class="i">col_list_chk</span> → <span class="point">.</span> <b>'('</b> <span class="i">name_list</span> <b>')'</b>
+  <a href="#rule_55"> 55</a>              | <span class="point">.</span> %empty  [';', ')', ',']
+
+    '('  <a href="#state_68">shift, and go to state 68</a>
+
+    $default  <a href="#rule_55">reduce using rule 55</a> (col_list_chk)
+
+    col_list_chk  <a href="#state_221">go to state 221</a>
+</p>
+
+<h3><a name="state_218" id="state_218"></a>state 218</h3>
+
+<p class="pre">  <a href="#rule_33"> 33</a> <span class="i">data_type</span> → <b>datatype_k</b> <b>'('</b> <b>number</b> <b>')'</b> <span class="point">.</span>
+
+    $default  <a href="#rule_33">reduce using rule 33</a> (data_type)
+</p>
+
+<h3><a name="state_219" id="state_219"></a>state 219</h3>
+
+<p class="pre">  <a href="#rule_42"> 42</a> <span class="i">special_ele</span> → <b>references_k</b> <b>name</b> <b>name</b> <span class="point">.</span>
+
+    $default  <a href="#rule_42">reduce using rule 42</a> (special_ele)
+</p>
+
+<h3><a name="state_220" id="state_220"></a>state 220</h3>
+
+<p class="pre">  <a href="#rule_87"> 87</a> <span class="i">orderby_list</span> → <span class="i">orderby_list</span> <b>','</b> <b>name</b> <span class="i">order_type</span> <span class="point">.</span>
+
+    $default  <a href="#rule_87">reduce using rule 87</a> (orderby_list)
+</p>
+
+<h3><a name="state_221" id="state_221"></a>state 221</h3>
+
+<p class="pre">  <a href="#rule_30"> 30</a> <span class="i">constraints</span> → <b>foreign_k</b> <b>key_k</b> <span class="i">col_list_chk</span> <b>references_k</b> <b>name</b> <span class="i">col_list_chk</span> <span class="point">.</span>
+
+    $default  <a href="#rule_30">reduce using rule 30</a> (constraints)
+</p>
+
+<div id="footer"><hr />This document was generated using
+      <a href="http://www.gnu.org/software/bison/" title="GNU Bison">
+      GNU Bison 3.0.4</a>
+      XML Automaton Report.<br />
+      Verbatim copying and distribution of this entire page is
+      permitted in any medium, provided this notice is preserved.</div></body>
+</html>
