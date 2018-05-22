@@ -78,7 +78,7 @@ class Column:public Data
 	string name;
 	int datatype,idx;
 	pugi::xml_node node;
-	bool attr[5];/*
+	bool attr[5]={false};/*
 	0=>unique
 	1=>primary
 	2=>auto_inc

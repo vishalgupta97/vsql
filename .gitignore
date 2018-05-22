@@ -2,6 +2,7 @@ pyGitBook-master/
 progress.xlsx
 testing/
 a.out
-*.xml
 *.xls
+*.png
+*.mdj
 error.txt

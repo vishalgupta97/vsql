@@ -56,7 +56,7 @@ void run(int connfd)
 				if(!stmt1->error)
 				{
 					stmt1->execute(&curdb);
-					if(stmt1->output.tellp()>0)
+					if(stmt1->output.str().size()>0)
 						output<<stmt1->output.str();
 				}
 				else
@@ -67,6 +67,6 @@ void run(int connfd)
 		delete stmt1;
 	}
 	if(curdb)
-		curdb->save();
-	root->save();
+			curdb->save();
+		root->save();
 }

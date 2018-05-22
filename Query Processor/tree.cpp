@@ -417,9 +417,10 @@ void Select_stmt::execute(Database **d)
 			index_type.push_back({clmn->idx,clmn->datatype});
 		}
 	}
+	int length=res.size();
 	if(limit>0&&res.size()>limit)
-		res.resize(limit);
-	for(int i=0;i<res.size();i++)
+		length=limit;
+	for(int i=0;i<length;i++)
 	{
 		for(int j=0;j<index_type.size();j++)
 			switch(index_type[j].second)
@@ -456,6 +457,8 @@ void Db_drop::execute(Database **d)
 {
 	unique_lock<shared_mutex> rootWLock(root->mutex);
 	auto it=root->databases.find(*db_name);
+	unique_lock<shared_mutex> dbWLock(it->second->mutex);
+	this_thread::sleep_for(10s);
 	string s=it->first;
 	remove(s.append(".xls").c_str());
 	root->node.remove_child(it->second->node);
@@ -922,10 +925,10 @@ void Insert_stmt::check(Database **d)
 	shared_lock<shared_mutex> tblRLock(tbl->mutex);
 	if(cols==NULL)
 	{
-		pugi::xml_node clmn=tbl->node.child("columns");
-		for(auto i=clmn.begin();i!=clmn.end();i++)
+		pugi::xml_node clmn_node=tbl->node.child("columns");
+		for(auto i=clmn_node.begin();i!=clmn_node.end();i++)
 		{
-			Column *clmn=tbl->columns[i->name()];
+			Column *clmn=tbl->columns[string(i->name())];
 			if(clmn->attr[2])
 			{
 				auto_inc=clmn;
@@ -1053,7 +1056,6 @@ void Insert_stmt::execute(Database **d)
 	shared_lock<shared_mutex> dbRLock(db->mutex);
 	Table* tbl=db->tables[*tbl_name];
 	unique_lock<shared_mutex> tblWLock(tbl->mutex);
-	this_thread::sleep_for(10s);
 	rowno=tbl->rowcnt;
 	int oldrowno=rowno;
 	pkcnt=tbl->pkcnt;
@@ -1065,7 +1067,10 @@ void Insert_stmt::execute(Database **d)
 		rowno++;
 		pkcnt++;
 		if(auto_inc)
-		sheet->writeNum(rowno,auto_inc->idx,pkcnt);
+		{
+			sheet->writeNum(rowno,auto_inc->idx,pkcnt);
+			tbl->primary.insert(to_string(pkcnt));
+		}
 		for(int j=0;j<vec->size();j++)
 		{
 			switch(vec->at(j)->type)
@@ -1146,6 +1151,7 @@ void Delete_stmt::execute(Database **d)
 	}
 	if(where_cond)
 	{
+		where_cond->input=res;
 		where_cond->execute(tbl,limit);
 		if(orderby_cond)
 		{
@@ -1164,7 +1170,6 @@ void Delete_stmt::execute(Database **d)
 	}
 	map<int,int> vals;
 	compress(res,vals);
-	cerr<<res.size()<<" "<<vals.size()<<endl;
 	for(auto i=tbl->columns.begin();i!=tbl->columns.end();i++)
 	{
 		if(i->second->attr[1])

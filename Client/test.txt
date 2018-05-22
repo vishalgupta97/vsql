@@ -1,0 +1,21 @@
+create database market;
+show databases;
+use market;
+create table items ( id int primary key auto_increment, name varchar, price int,discount decimal);
+create table quantity ( id int primary key auto_increment, itemsid int references items id, value int);
+show tables;
+show columns in items;
+insert into items values (bat,100,0.5),(ball,10,0.1), (mat,20,0.5),(apple,30,0.0),(banana,40,0.01), (ball,20,0.2);
+insert into quantity values(1,10),(1,100),(2,50),(3,20),(4,30);
+select * from items order by discount desc limit 3;
+select name,price,discount from items where name=bat or name=ball and discount=0.1;
+select itemsid,value from quantity where value>=20 or itemsid!=5;
+update items set discount=0.5 where name=apple;
+delete from items where name=apple;
+create database shops;
+use shops;
+create table items ( id int primary key auto_increment, name varchar, price int,discount decimal);
+create table quantity ( id int primary key auto_increment, itemsid int references items id, value int);
+insert into items values (bat,100,0.5),(ball,10,0.1), (mat,20,0.5),(apple,30,0.0),(banana,40,0.01), (ball,20,0.2);
+insert into quantity values(1,10),(1,100),(2,50),(3,20),(4,30);
+
