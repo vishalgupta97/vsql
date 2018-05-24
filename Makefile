@@ -8,7 +8,7 @@ ifeq ($(ARCH), 32)
 else
   LIBPATH = $(LIB)/libxl/lib64
 endif
-CFLAGS = -I $(LIB)/pugixml -I $(LIB)/libxl/include_cpp $(LIB)/pugixml/pugixml.cpp -L $(LIBPATH) -I $(LIB)/LibBoolEE $(LIB)/LibBoolEE/LibBoolEE.cpp --std=c++17 -Wl,-rpath,$(LIBPATH)
+CFLAGS = -I $(LIB)/pugixml -I $(LIB)/libxl/include_cpp $(LIB)/pugixml/pugixml.cpp -L $(LIBPATH) -I $(LIB)/LibBool $(LIB)/LibBool/LibBoolEE.cpp --std=c++17 -Wl,-rpath,$(LIBPATH)
 
 all: sql
 
